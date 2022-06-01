@@ -11,11 +11,6 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// Generate a beautiful human-readable count, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y`.
     /// <br>If more than this would be needed (possible with a [u128]), a "+" is used.
     ///
-    /// # Features:
-    /// - `1024` => enable to apply prefixes by `1024` instead of `1000`
-    /// - `iec` => enable to use IEC prefixes: `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, `Ei`, `Zi`, `Yi` (implies `1024`)
-    /// - `nospace` => enable to remove the spaces: `15.6GB` instead of `15.6 GB`
-    ///
     /// ```
     /// use human_repr::HumanRepr;
     /// assert_eq!("43.2 Mcoins", 43214321u32.human_count("coins"));
@@ -37,9 +32,6 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// Generate a beautiful human-readable duration, supporting nanos (`ns`), millis (`ms`),
     /// micros (`µs`), seconds (`s`), and even hour-minute-seconds (`HH:MM:SS`).
     ///
-    /// ## Features:
-    /// - `nospace` => enable to remove the spaces: `15.6µs` instead of `15.6 µs`
-    ///
     /// ```
     /// use human_repr::HumanRepr;
     /// assert_eq!("160 ms", 0.1599999.human_duration());
@@ -49,9 +41,6 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// Generate a beautiful human-readable throughput, supporting per-day (`/d`), per-hour (`/h`),
     /// per-month (`/m`), and per-sec (`/s`).
     /// <br>When in `/s`, SI prefixes can appear, as in [Self::human_count()].
-    ///
-    /// ### Features:
-    /// - `nospace` => enable to remove the spaces: `15.6GB/s` instead of `15.6 GB/s`
     ///
     /// ```
     /// use human_repr::HumanRepr;

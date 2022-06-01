@@ -8,17 +8,19 @@
 ## What it does
 
 Easily generate human-readable descriptions directly on primitive numbers, of several kinds:
-- counts: which get SI prefixes: "k", "M", "G", "T", "P", "E", "Z", "Y";
-- durations: with support for nanoseconds, millis, µs, secs, and even HH:MM:SS;
-- throughputs: which get, in addition to SI prefixes, support for /day, /hour, /month, and /sec!!
+- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (optional IEC standard);
+- durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), and even hour-minute-seconds (`HH:MM:SS`);
+- throughputs, supporting per-day (`/d`), per-hour (`/h`), per-month (`/m`), and per-sec (`/s`).
 
-They work on the following Rust primitive types: `u8, u16, u32, u64, u128, usize, f32, f64, i8, i16, i32, i64, i128, isize`.
-<br>The entity they refer to is configurable, so you can send "B" for bytes, or "it" for iterations, or "errors", etc.
+It is also blazingly fast, taking only ~80 ns to generate a representation, and well-tested. Does not use any dependencies.
+
+They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
+`f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`.
+
+The `what` parameter some methods refer to means the entity you're dealing with, like bytes, actions, iterations, errors, whatever! Just send that text, and you're good to go!
 <br>Bytes have dedicated methods for convenience.
 
-It is also blazingly fast, taking only ~80 ns to generate, and well-tested. Does not use any dependencies.
-
-You can, for example:
+## Examples 
 
 ```rust
 use human_repr::HumanRepr;
@@ -36,7 +38,6 @@ assert_eq!("1:14:48", 4488.395.human_duration());
 assert_eq!("1.2 MB/s", (1234567. / 1.).human_throughput_bytes());
 assert_eq!("6.1 tests/m", (10. / 99.).human_throughput("tests"));
 assert_eq!("9 errors/d", (125. / 1200000.).human_throughput("errors"));
-
 ```
 
 ## How to use it
@@ -49,13 +50,15 @@ human-repr = "0"
 
 Use the trait:
 
-```rust
+```rust, no_run
 use human_repr::HumanRepr;
 ```
 
 That's it! You can now call on any number:
 
-```rust
+```rust, no_run
+# use human_repr::HumanRepr;
+# let num = 123;
 num.human_count("unit");
 num.human_count_bytes();
 
@@ -67,11 +70,20 @@ num.human_throughput_bytes();
 
 ## Rust features:
 
-- `1024` => enable to apply prefixes by `1024` instead of `1000`
-- `iec` => enable to use IEC prefixes: `"Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"` (implies `1024`)
-- `nospace` => enable to remove the spaces: `15.6µs` instead of `15.6 µs`
+According to the SI standard, there are 1000 bytes in a `kilobyte`.
+<br>There is another standard called IEC that has 1024 bytes in a `kibibyte`, but this is only useful when measuring things that are naturally a power of two, e.g. a stick of RAM.
+
+Be careful to not render IEC quantities with SI units, which would be incorrect. But I still support it, if you really want to ;)
+
+By default, `human-repr` will use SI with `1000` quantities, with the prefixes: `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y`.
+<br>You can modify this by:
+- `iec` => enable to use IEC prefixes: `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, `Ei`, `Zi`, `Yi` (implies `1024`)
+- `1024` => enable to use `1024` quantities only, with prefixes: `K`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (note the upper 'K')
+- `nospace` => enable to remove the space between values and units everywhere: `15.6µs` instead of `15.6 µs`
 
 ## Changelog highlights
+- 0.3.x Jun 01, 2022: support for a new group of prefixes for `1024` only (without `iec`)
+- 0.2.x Jun 01, 2022: more flexible API (`impl AsRef<str>`), greatly improved documentation
 - 0.1.x Jun 01, 2022: first release, include readme, method and module docs, describe features already implemented
 
 
