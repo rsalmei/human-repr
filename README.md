@@ -16,7 +16,7 @@ They work on the following Rust primitive types: `u8, u16, u32, u64, u128, usize
 <br>The entity they refer to is configurable, so you can send "B" for bytes, or "it" for iterations, or "errors", etc.
 <br>Bytes have dedicated methods for convenience.
 
-It is also blazingly fast, taking only ~80 ns to generate, and well-tested.
+It is also blazingly fast, taking only ~80 ns to generate, and well-tested. Does not use any dependencies.
 
 You can, for example:
 
@@ -64,6 +64,12 @@ That's it! You can now call on any number:
     fn human_throughput(self, what: &str) -> String;
     fn human_throughput_bytes(self) -> String;
 ```
+
+## Rust features:
+
+`1024` => enable to apply prefixes by `1024` instead of `1000`
+`iec` => enable to use IEC prefixes: `"Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"`
+`nospace` => enable to remove the spaces: `15.6µs` instead of `15.6 µs`
 
 ## Changelog
 - 0.1.2 Jun 01, 2022: include module docs
