@@ -33,7 +33,7 @@ mod tests {
     use crate::HumanRepr;
 
     #[test]
-    fn basic() {
+    fn operation() {
         assert_eq!("123 kB", 123000_u64.human_count_bytes());
         assert_eq!("123.5 kB", 123456_u64.human_count_bytes());
         assert_eq!("23 B", 23u8.human_count_bytes());
@@ -48,5 +48,20 @@ mod tests {
         assert_eq!("9.22 EB", i64::MAX.human_count_bytes());
         assert_eq!("-9.22 EB", i64::MIN.human_count_bytes());
         assert_eq!("340282366920.94 +B", u128::MAX.human_count_bytes());
+    }
+
+    #[test]
+    fn flexibility() {
+        assert_eq!("123 MCrabs", 123e6.human_count("Crabs"));
+        assert_eq!("123 MCrabs", 123e6.human_count("Crabs".to_owned()));
+        assert_eq!("123 k🦀", 123e3.human_count("🦀"));
+    }
+
+    #[test]
+    fn ownership() {
+        let mut a = 42000;
+        assert_eq!("42 kB", a.human_count_bytes());
+        assert_eq!("42 kB", (&a).human_count_bytes());
+        assert_eq!("42 kB", (&mut a).human_count_bytes());
     }
 }

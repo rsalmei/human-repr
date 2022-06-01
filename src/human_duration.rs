@@ -34,7 +34,7 @@ mod tests {
     use crate::HumanRepr;
 
     #[test]
-    fn basic() {
+    fn operation() {
         assert_eq!("1 s", 1.human_duration());
         assert_eq!("-1 s", (-1).human_duration());
         assert_eq!("1.2 ns", 0.00000000123.human_duration());
@@ -66,5 +66,13 @@ mod tests {
         assert_eq!("1:14:48", 4488.395.human_duration());
         assert_eq!("2:46:40", 10000u64.human_duration());
         assert_eq!("27:46:40", 100000u64.human_duration());
+    }
+
+    #[test]
+    fn ownership() {
+        let mut a = 0.01;
+        assert_eq!("10 ms", a.human_duration());
+        assert_eq!("10 ms", (&a).human_duration());
+        assert_eq!("10 ms", (&mut a).human_duration());
     }
 }

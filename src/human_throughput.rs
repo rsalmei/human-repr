@@ -26,7 +26,7 @@ mod tests {
     use crate::HumanRepr;
 
     #[test]
-    fn basic() {
+    fn operation() {
         assert_eq!("1 B/s", 1.human_throughput_bytes());
         assert_eq!("-1 B/s", (-1.).human_throughput_bytes());
         assert_eq!("1.2 MB/s", (1234567. / 1.).human_throughput_bytes());
@@ -55,5 +55,20 @@ mod tests {
         assert_eq!("23.99 B/d", (1. / 3601.).human_throughput_bytes());
         assert_eq!("23.95 B/d", (1. / 3608.).human_throughput_bytes());
         assert_eq!("2.16 B/d", (2. / 80000.).human_throughput_bytes());
+    }
+
+    #[test]
+    fn flexibility() {
+        assert_eq!("123 MCrabs/s", 123e6.human_throughput("Crabs"));
+        assert_eq!("123 MCrabs/s", 123e6.human_throughput("Crabs".to_owned()));
+        assert_eq!("123 M🦀/s", 123e6.human_throughput("🦀"));
+    }
+
+    #[test]
+    fn ownership() {
+        let mut a = 42000;
+        assert_eq!("42 kB/s", a.human_throughput_bytes());
+        assert_eq!("42 kB/s", (&a).human_throughput_bytes());
+        assert_eq!("42 kB/s", (&mut a).human_throughput_bytes());
     }
 }
