@@ -74,14 +74,14 @@ const BYTES: &str = "B";
 
 /// Human representation trait, already implemented for all Rust primitive number types.
 pub trait HumanRepr: sealed::Sealed + Sized {
-    /// Generate a beautiful human count.
+    /// Generate a beautiful human-readable count.
     ///
     /// ```
     /// use human_repr::HumanRepr;
     /// assert_eq!("43.2 Mcoins", 43214321u32.human_count("coins"));
     /// ```
-    fn human_count(self, what: &str) -> String;
-    /// Generate a beautiful human count.
+    fn human_count(self, what: impl AsRef<str>) -> String;
+    /// Generate a beautiful human-readable count.
     ///
     /// ```
     /// use human_repr::HumanRepr;
@@ -91,7 +91,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
         self.human_count(BYTES)
     }
 
-    /// Generate a beautiful human duration.
+    /// Generate a beautiful human-readable duration.
     ///
     /// ```
     /// use human_repr::HumanRepr;
@@ -99,14 +99,14 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// ```
     fn human_duration(self) -> String;
 
-    /// Generate a beautiful human throughput.
+    /// Generate a beautiful human-readable throughput.
     ///
     /// ```
     /// use human_repr::HumanRepr;
     /// assert_eq!("1.2 Mcoins/s", 1234567.8.human_throughput("coins"));
     /// ```
-    fn human_throughput(self, what: &str) -> String;
-    /// Generate a beautiful human throughput.
+    fn human_throughput(self, what: impl AsRef<str>) -> String;
+    /// Generate a beautiful human-readable throughput.
     ///
     /// ```
     /// use human_repr::HumanRepr;
@@ -117,22 +117,22 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     }
 }
 
-macro_rules! impl_human {
+macro_rules! impl_trait {
     {$($t:ty),+} => {$(
         impl HumanRepr for $t {
-            fn human_count(self, what: &str) -> String {
-                human_count::conv(self as f64, what)
+            fn human_count(self, what: impl AsRef<str>) -> String {
+                human_count::conv(self as f64, what.as_ref())
             }
             fn human_duration(self) -> String {
                 human_duration::conv(self as f64)
             }
-            fn human_throughput(self, what: &str) -> String {
-                human_throughput::conv(self as f64, what)
+            fn human_throughput(self, what: impl AsRef<str>) -> String {
+                human_throughput::conv(self as f64, what.as_ref())
             }
         }
     )+}
 }
-impl_human!(u8, u16, u32, u64, u128, usize, f32, f64, i8, i16, i32, i64, i128, isize);
+impl_trait!(u8, u16, u32, u64, u128, usize, f32, f64, i8, i16, i32, i64, i128, isize);
 
 mod sealed {
     pub trait Sealed {}
