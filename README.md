@@ -56,13 +56,13 @@ use human_repr::HumanRepr;
 That's it! You can now call on any number:
 
 ```rust
-    fn human_count(self, what: &str) -> String;
-    fn human_count_bytes(self) -> String;
+num.human_count("unit");
+num.human_count_bytes();
 
-    fn human_duration(self) -> String;
+num.human_duration();
 
-    fn human_throughput(self, what: &str) -> String;
-    fn human_throughput_bytes(self) -> String;
+num.human_throughput("unit");
+num.human_throughput_bytes();
 ```
 
 ## Rust features:

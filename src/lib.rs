@@ -42,20 +42,21 @@
 //!
 //! Use the trait:
 //!
-//! ```rust
+//! ```no_run
 //! use human_repr::HumanRepr;
 //! ```
 //!
 //! That's it! You can now call on any number:
 //!
-//! ```rust
-//!     fn human_count(self, what: &str) -> String;
-//!     fn human_count_bytes(self) -> String;
+//! ```no_run
+//! # use human_repr::HumanRepr;
+//! 123.human_count("unit");
+//! 123.human_count_bytes();
 //!
-//!     fn human_duration(self) -> String;
+//! 123.human_duration();
 //!
-//!     fn human_throughput(self, what: &str) -> String;
-//!     fn human_throughput_bytes(self) -> String;
+//! 123.human_throughput("unit");
+//! 123.human_throughput_bytes();
 //! ```
 //!
 //! ## Rust features:
