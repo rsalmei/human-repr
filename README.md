@@ -7,7 +7,7 @@
 
 ## What it does
 
-This easily generate human-readable descriptions directly on primitive numbers, of several kinds:
+Easily generate human-readable descriptions directly on primitive numbers, of several kinds:
 - counts: which get SI prefixes: "k", "M", "G", "T", "P", "E", "Z", "Y";
 - durations: with support for nanoseconds, millis, µs, secs, and even HH:MM:SS;
 - throughputs: which get, in addition to SI prefixes, support for /day, /hour, /month, and /sec!!
@@ -16,7 +16,7 @@ They work on the following Rust primitive types: `u8, u16, u32, u64, u128, usize
 <br>The entity they refer to is configurable, so you can send "B" for bytes, or "it" for iterations, or "errors", etc.
 <br>Bytes have dedicated methods for convenience.
 
-And it is blazingly fast, taking only ~80 ns to generate, and well-tested.
+It is also blazingly fast, taking only ~80 ns to generate, and well-tested.
 
 You can, for example:
 
@@ -66,7 +66,8 @@ That's it! You can now call on any number:
 ```
 
 ## Changelog
-- 0.1.1 Jun 01, 2022: include readme
+- 0.1.2 Jun 01, 2022: include module docs
+- 0.1.1 Jun 01, 2022: include readme and method docs
 - 0.1.0 Jun 01, 2022: first release
 
 
