@@ -67,9 +67,9 @@ That's it! You can now call on any number:
 
 ## Rust features:
 
-`1024` => enable to apply prefixes by `1024` instead of `1000`
-`iec` => enable to use IEC prefixes: `"Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"`
-`nospace` => enable to remove the spaces: `15.6µs` instead of `15.6 µs`
+- `1024` => enable to apply prefixes by `1024` instead of `1000`
+- `iec` => enable to use IEC prefixes: `"Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"`
+- `nospace` => enable to remove the spaces: `15.6µs` instead of `15.6 µs`
 
 ## Changelog
 - 0.1.3 Jun 01, 2022: describe features already implemented
