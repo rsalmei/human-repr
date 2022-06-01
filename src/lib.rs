@@ -13,7 +13,7 @@
 //!
 //! You can, for example:
 //!
-//! ```rust
+//! ```
 //! use human_repr::HumanRepr;
 //!
 //! // counts (bytes or anything)
@@ -50,13 +50,14 @@
 //!
 //! ```no_run
 //! # use human_repr::HumanRepr;
-//! 123.human_count("unit");
-//! 123.human_count_bytes();
+//! # let num = 123;
+//! num.human_count("unit");
+//! num.human_count_bytes();
 //!
-//! 123.human_duration();
+//! num.human_duration();
 //!
-//! 123.human_throughput("unit");
-//! 123.human_throughput_bytes();
+//! num.human_throughput("unit");
+//! num.human_throughput_bytes();
 //! ```
 //!
 //! ## Rust features:
