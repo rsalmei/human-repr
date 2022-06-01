@@ -29,6 +29,7 @@ mod tests {
     fn basic() {
         assert_eq!("1 B/s", 1.human_throughput_bytes());
         assert_eq!("-1 B/s", (-1.).human_throughput_bytes());
+        assert_eq!("1.2 MB/s", (1234567. / 1.).human_throughput_bytes());
         assert_eq!("10 B/s", (10. / 1.).human_throughput_bytes());
         assert_eq!("30 B/m", (1. / 2.).human_throughput_bytes());
         assert_eq!("-30 B/m", (-1. / 2.).human_throughput_bytes());
@@ -38,6 +39,7 @@ mod tests {
         assert_eq!("1.8 B/m", (3. / 100.).human_throughput_bytes());
         assert_eq!("4.4 B/m", (8. / 110.).human_throughput_bytes());
         assert_eq!("6.8 B/h", (3. / 1600.).human_throughput_bytes());
+        assert_eq!("1.9 kB/s", (3000000. / 1600.).human_throughput_bytes());
         assert_eq!("4.8 B/m", (54327375. / 675876554.).human_throughput_bytes());
         assert_eq!("28.9 B/h", (5432737. / 675876554.).human_throughput_bytes());
         assert_eq!("8 B/s", (5432737542. / 675876554.).human_throughput_bytes());
