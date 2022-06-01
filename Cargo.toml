@@ -1,12 +1,12 @@
 [package]
 name = "human-repr"
-version = "0.1.5"
+version = "0.2.0"
 edition = "2021"
 
 authors = ["Rogério Sampaio de Almeida <rsalmei@gmail.com>"]
 description = "Generate beautiful human representations of bytes, durations and even throughputs!"
 keywords = ["format", "convert", "bytes", "duration", "throughput"]
-repository = "https://github.com/rsalmei/human-repr.git"
+repository = "https://github.com/rsalmei/human-repr"
 readme = "README.md"
 license = "MIT"
 
