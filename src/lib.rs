@@ -60,9 +60,9 @@
 //!
 //! ## Rust features:
 //!
-//! `1024` => enable to apply prefixes by `1024` instead of `1000`
-//! `iec` => enable to use IEC prefixes: `"Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"`
-//! `nospace` => enable to remove the spaces: `15.6µs` instead of `15.6 µs`
+//! - `1024` => enable to apply prefixes by `1024` instead of `1000`
+//! - `iec` => enable to use IEC prefixes: `"Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"` (implies `1024`)
+//! - `nospace` => enable to remove the spaces: `15.6µs` instead of `15.6 µs`
 //!
 
 mod human_count;
