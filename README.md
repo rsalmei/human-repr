@@ -72,6 +72,7 @@ That's it! You can now call on any number:
 `nospace` => enable to remove the spaces: `15.6µs` instead of `15.6 µs`
 
 ## Changelog
+- 0.1.3 Jun 01, 2022: describe features already implemented
 - 0.1.2 Jun 01, 2022: include module docs
 - 0.1.1 Jun 01, 2022: include readme and method docs
 - 0.1.0 Jun 01, 2022: first release
