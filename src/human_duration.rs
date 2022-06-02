@@ -15,7 +15,7 @@ pub fn conv(mut val: f64) -> String {
             r if r.abs() >= size => val /= next,
             r if r.fract() == 0. => return format!("{r:.0}{SPACE}{scale}"),
             r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{scale}"),
-            r => return format!("{r:.0$}{SPACE}{scale}", dec),
+            r => return format!("{r:.dec$}{SPACE}{scale}"),
         }
     }
 

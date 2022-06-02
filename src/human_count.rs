@@ -3,9 +3,9 @@ use super::{rounded, SPACE};
 // Not enabling any optional features gets: SI symbols, divisor is 1000, and with space.
 const SPEC: &[&str] = {
     match (cfg!(feature = "iec"), cfg!(feature = "1024")) {
-        (true, _) => &["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"],
-        (false, false) => &["", "k", "M", "G", "T", "P", "E", "Z", "Y"], // actual SI (with 1000).
-        (false, true) => &["", "K", "M", "G", "T", "P", "E", "Z", "Y"],  // SI with 1024.
+        (true, _) => &["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"], // IEC (1024)
+        (false, false) => &["", "k", "M", "G", "T", "P", "E", "Z", "Y"],    // SI (1000).
+        (false, true) => &["", "K", "M", "G", "T", "P", "E", "Z", "Y"], // IEC (without "i" prefixes).
     }
 };
 const DECIMALS: &[usize] = &[1, 1, 1, 2, 2, 2, 2, 2, 2];
@@ -22,7 +22,7 @@ pub fn conv(mut val: f64, what: &str) -> String {
             r if r.abs() >= DIVISOR => val /= DIVISOR,
             r if r.fract() == 0. => return format!("{r:.0}{SPACE}{scale}{what}"),
             r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{scale}{what}"),
-            r => return format!("{r:.0$}{SPACE}{scale}{what}", dec),
+            r => return format!("{r:.dec$}{SPACE}{scale}{what}"),
         }
     }
 
