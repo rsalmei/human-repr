@@ -7,18 +7,18 @@ const SPEC: &[(f64, &str, usize)] = &[
     // "/s" in code.
 ];
 
-pub fn conv(mut val: f64, what: &str) -> String {
+pub fn conv(mut val: f64, unit: &str) -> String {
     val *= 60. * 60. * 24.;
     for &(size, scale, dec) in SPEC {
         match rounded(val, dec) {
             r if r.abs() >= size => val /= size,
-            r if r.fract() == 0. => return format!("{r:.0}{SPACE}{what}{scale}"),
-            r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{what}{scale}"),
-            r => return format!("{r:.dec$}{SPACE}{what}{scale}"),
+            r if r.fract() == 0. => return format!("{r:.0}{SPACE}{unit}{scale}"),
+            r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{unit}{scale}"),
+            r => return format!("{r:.dec$}{SPACE}{unit}{scale}"),
         }
     }
 
-    format!("{}/s", val.human_count(what))
+    format!("{}/s", val.human_count(unit))
 }
 
 #[cfg(test)]

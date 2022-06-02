@@ -15,7 +15,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// use human_repr::HumanRepr;
     /// assert_eq!("43.2 Mcoins", 43214321u32.human_count("coins"));
     /// ```
-    fn human_count(self, what: impl AsRef<str>) -> String;
+    fn human_count(self, unit: impl AsRef<str>) -> String;
 
     /// Generate a beautiful human-readable count, using `"B"` as the unit.
     ///
@@ -46,7 +46,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// use human_repr::HumanRepr;
     /// assert_eq!("1.2 Mcoins/s", 1234567.8.human_throughput("coins"));
     /// ```
-    fn human_throughput(self, what: impl AsRef<str>) -> String;
+    fn human_throughput(self, unit: impl AsRef<str>) -> String;
 
     /// Generate a beautiful human-readable throughput, using `"B"` as the unit.
     ///
@@ -64,14 +64,14 @@ pub trait HumanRepr: sealed::Sealed + Sized {
 macro_rules! impl_trait {
     {$($t:ty),+} => {$(
         impl HumanRepr for $t {
-            fn human_count(self, what: impl AsRef<str>) -> String {
-                human_count::conv(self as f64, what.as_ref())
+            fn human_count(self, unit: impl AsRef<str>) -> String {
+                human_count::conv(self as f64, unit.as_ref())
             }
             fn human_duration(self) -> String {
                 human_duration::conv(self as f64)
             }
-            fn human_throughput(self, what: impl AsRef<str>) -> String {
-                human_throughput::conv(self as f64, what.as_ref())
+            fn human_throughput(self, unit: impl AsRef<str>) -> String {
+                human_throughput::conv(self as f64, unit.as_ref())
             }
         }
     )+}

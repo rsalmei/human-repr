@@ -16,17 +16,17 @@ const DIVISOR: f64 = {
     }
 };
 
-pub fn conv(mut val: f64, what: &str) -> String {
+pub fn conv(mut val: f64, unit: &str) -> String {
     for (&scale, &dec) in SPEC.iter().zip(DECIMALS) {
         match rounded(val, dec) {
             r if r.abs() >= DIVISOR => val /= DIVISOR,
-            r if r.fract() == 0. => return format!("{r:.0}{SPACE}{scale}{what}"),
-            r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{scale}{what}"),
-            r => return format!("{r:.dec$}{SPACE}{scale}{what}"),
+            r if r.fract() == 0. => return format!("{r:.0}{SPACE}{scale}{unit}"),
+            r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{scale}{unit}"),
+            r => return format!("{r:.dec$}{SPACE}{scale}{unit}"),
         }
     }
 
-    format!("{val:.2}{SPACE}+{what}")
+    format!("{val:.2}{SPACE}+{unit}")
 }
 
 #[cfg(test)]
