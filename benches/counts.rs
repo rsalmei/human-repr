@@ -1,23 +1,30 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use human_repr::HumanRepr;
+use std::fmt::Write;
 
-pub fn benchmark_small(c: &mut Criterion) {
-    c.bench_function("human-count 2B", |b| {
-        b.iter(|| black_box(2_u64).human_count_bytes())
-    });
+fn benchmark<T: HumanRepr>(val: T, buf: &mut String) {
+    let _ = write!(buf, "{}", black_box(val).human_count_bytes());
+    buf.clear();
 }
 
-pub fn benchmark_medium(c: &mut Criterion) {
+pub fn small(c: &mut Criterion) {
+    let mut buf = String::with_capacity(64);
+    c.bench_function("human-count 2B", |b| b.iter(|| benchmark(2_u64, &mut buf)));
+}
+
+pub fn medium(c: &mut Criterion) {
+    let mut buf = String::with_capacity(64);
     c.bench_function("human-count 20MB", |b| {
-        b.iter(|| black_box(23433454432_u64).human_count_bytes())
+        b.iter(|| benchmark(23433454432_u64, &mut buf))
     });
 }
 
-pub fn benchmark_big(c: &mut Criterion) {
+pub fn big(c: &mut Criterion) {
+    let mut buf = String::with_capacity(64);
     c.bench_function("human-count 200TB", |b| {
-        b.iter(|| black_box(234334544434332_u64).human_count_bytes())
+        b.iter(|| benchmark(234334544434332_u64, &mut buf))
     });
 }
 
-criterion_group!(benches, benchmark_small, benchmark_medium, benchmark_big);
+criterion_group!(benches, small, medium, big);
 criterion_main!(benches);

@@ -1,23 +1,30 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use human_repr::HumanRepr;
+use std::fmt::Write;
 
-pub fn benchmark_small(c: &mut Criterion) {
+fn benchmark<T: HumanRepr>(val: T, buf: &mut String) {
+    let _ = write!(buf, "{}", black_box(val).human_duration());
+    buf.clear();
+}
+
+pub fn small(c: &mut Criterion) {
+    let mut buf = String::with_capacity(64);
     c.bench_function("human-duration 2ns", |b| {
-        b.iter(|| black_box(0.0000000024).human_duration())
+        b.iter(|| benchmark(0.0000000024, &mut buf))
     });
 }
 
-pub fn benchmark_medium(c: &mut Criterion) {
+pub fn medium(c: &mut Criterion) {
+    let mut buf = String::with_capacity(64);
     c.bench_function("human-duration 2ms", |b| {
-        b.iter(|| black_box(0.0244432).human_duration())
+        b.iter(|| benchmark(0.0244432, &mut buf))
     });
 }
 
-pub fn benchmark_big(c: &mut Criterion) {
-    c.bench_function("human-duration 2h", |b| {
-        b.iter(|| black_box(7283).human_duration())
-    });
+pub fn big(c: &mut Criterion) {
+    let mut buf = String::with_capacity(64);
+    c.bench_function("human-duration 2m", |b| b.iter(|| benchmark(123, &mut buf)));
 }
 
-criterion_group!(benches, benchmark_small, benchmark_medium, benchmark_big);
+criterion_group!(benches, small, medium, big);
 criterion_main!(benches);
