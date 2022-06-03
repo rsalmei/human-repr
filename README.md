@@ -9,7 +9,7 @@
 
 Easily generate human-readable descriptions directly on primitive numbers, of several kinds:
 - counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (optional IEC and "mixed" ones, see Rust features);
-- durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), and even hour-minute-seconds (`HH:MM:SS`);
+- durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), minutes (`[M]M:SS`), and even hours (`[H]H:MM:SS`);
 - throughputs, supporting per-day (`/d`), per-hour (`/h`), per-minute (`/m`), and per-second (`/s`).
 
 It does not use any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns to generate a representation! (criterion benchmarks inside)
@@ -118,6 +118,8 @@ Oh, this is the simplest of them all! I just continually divide by the divisor (
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
+- 0.5.x Jun 03, 2022: new minutes representation M:SS, between seconds and complete H:MM:SS
+- 0.4.x Jun 03, 2022: even faster implementation, which does not do any String allocations
 - 0.3.x Jun 01, 2022: support for a new group of prefixes for `1024` only (without `iec`)
 - 0.2.x Jun 01, 2022: more flexible API (`impl AsRef<str>`), greatly improved documentation
 - 0.1.x Jun 01, 2022: first release, include readme, method and module docs, describe features already implemented
