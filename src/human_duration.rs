@@ -23,13 +23,16 @@ impl fmt::Display for HumanDuration {
 
         val = val.round();
         let m = val / 60.;
-        write!(
-            f,
-            "{}:{:02}:{:02}",
-            (m / 60.).trunc(),
-            (m % 60.).trunc(),
-            (val % 60.).trunc()
-        )
+        match m < 60. {
+            true => write!(f, "{}:{:02}", m.trunc(), (val % 60.).trunc()),
+            false => write!(
+                f,
+                "{}:{:02}:{:02}",
+                (m / 60.).trunc(),
+                (m % 60.).trunc(),
+                (val % 60.).trunc()
+            ),
+        }
     }
 }
 
@@ -73,15 +76,13 @@ mod tests {
         assert_eq!("59 s", 59.0.human_duration());
         assert_eq!("59.9 s", 59.9.human_duration());
         assert_eq!("59.99 s", 59.99.human_duration());
-        assert_eq!("0:01:00", 59.999.human_duration());
-        assert_eq!("0:01:00", 60.0.human_duration());
-        assert_eq!("0:01:08", 68.09.human_duration());
-        assert_eq!("0:01:09", 68.5.human_duration());
-        assert_eq!("0:01:01", 60.99.human_duration());
-        assert_eq!("0:02:06", 125.825.human_duration());
-        assert_eq!("1:14:48", 4488.395.human_duration());
-        assert_eq!("2:46:40", 10000u64.human_duration());
-        assert_eq!("27:46:40", 100000u64.human_duration());
+        assert_eq!("1:00", 59.995.human_duration());
+        assert_eq!("1:08", 68.09.human_duration());
+        assert_eq!("19:21", 1160.99.human_duration());
+        assert_eq!("1:04:48", 3888.395.human_duration());
+        assert_eq!("2:46:40", 10000u16.human_duration());
+        assert_eq!("27:46:40", 100000i64.human_duration());
+        assert_eq!("277:46:40", 1000000isize.human_duration());
     }
 
     #[test]
