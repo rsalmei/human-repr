@@ -33,6 +33,16 @@ impl<T: AsRef<str>> fmt::Display for HumanCount<T> {
     }
 }
 
+impl<T: AsRef<str>> PartialEq<HumanCount<T>> for &str {
+    fn eq(&self, other: &HumanCount<T>) -> bool {
+        *self == &other.to_string()
+    }
+}
+
+impl<T: AsRef<str>> PartialEq<&str> for HumanCount<T> {
+    fn eq(&self, other: &&str) -> bool {
+        &self.to_string() == other
+    }
 }
 
 #[cfg(test)]

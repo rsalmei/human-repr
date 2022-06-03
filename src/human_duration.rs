@@ -33,6 +33,16 @@ impl fmt::Display for HumanDuration {
     }
 }
 
+impl PartialEq<HumanDuration> for &str {
+    fn eq(&self, other: &HumanDuration) -> bool {
+        *self == &other.to_string()
+    }
+}
+
+impl PartialEq<&str> for HumanDuration {
+    fn eq(&self, other: &&str) -> bool {
+        other == &self.to_string()
+    }
 }
 
 #[cfg(test)]

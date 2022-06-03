@@ -25,6 +25,16 @@ impl<T: AsRef<str>> fmt::Display for HumanThroughput<T> {
     }
 }
 
+impl<T: AsRef<str>> PartialEq<HumanThroughput<T>> for &str {
+    fn eq(&self, other: &HumanThroughput<T>) -> bool {
+        *self == &other.to_string()
+    }
+}
+
+impl<T: AsRef<str>> PartialEq<&str> for HumanThroughput<T> {
+    fn eq(&self, other: &&str) -> bool {
+        &self.to_string() == other
+    }
 }
 
 #[cfg(test)]
