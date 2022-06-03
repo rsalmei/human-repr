@@ -8,11 +8,12 @@
 ## What it does
 
 Easily generate human-readable descriptions directly on primitive numbers, of several kinds:
-- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (optional IEC standard);
+- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (optional IEC and "mixed" ones, see Rust features);
 - durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), and even hour-minute-seconds (`HH:MM:SS`);
 - throughputs, supporting per-day (`/d`), per-hour (`/h`), per-minute (`/m`), and per-second (`/s`).
 
-It is also blazingly fast, taking only ~80 ns to generate a representation (criterion benchmarks inside), and well-tested. Does not use any dependencies.
+It does not use any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns to generate a representation! (criterion benchmarks inside)
+<br>In the new version 0.4, it even does not allocate Strings anymore! I've returned structs that implement [`std::fmt::Display`], so you can now print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do 😜
 
 They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
 `f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`.
