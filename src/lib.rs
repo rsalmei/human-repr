@@ -4,18 +4,25 @@ mod human_count;
 mod human_duration;
 mod human_throughput;
 
+#[derive(Debug)]
+pub struct HumanCount<T>(f64, T);
+#[derive(Debug)]
+pub struct HumanDuration(f64);
+#[derive(Debug)]
+pub struct HumanThroughput<T>(f64, T);
+
 const BYTES: &str = "B";
 
 /// Human representation trait, already implemented for all Rust primitive number types.
 pub trait HumanRepr: sealed::Sealed + Sized {
-    /// Generate a beautiful human-readable count, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y`.
-    /// <br>If more than this would be needed (possible with a [u128]), a "+" is used.
+    /// Generate a beautiful human-readable count, supporting SI prefixes and others.
+    /// <br>If an even larger scale would be needed (possible with a [u128]), a "+" is used.
     ///
     /// ```
     /// use human_repr::HumanRepr;
     /// assert_eq!("43.2 Mcoins", 43214321u32.human_count("coins"));
     /// ```
-    fn human_count(self, unit: impl AsRef<str>) -> String;
+    fn human_count<T>(self, unit: T) -> HumanCount<T>;
 
     /// Generate a beautiful human-readable count, using `"B"` as the unit.
     ///
@@ -25,7 +32,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// use human_repr::HumanRepr;
     /// assert_eq!("43.2 MB", 43214321u32.human_count_bytes());
     /// ```
-    fn human_count_bytes(self) -> String {
+    fn human_count_bytes(self) -> HumanCount<&'static str> {
         self.human_count(BYTES)
     }
 
@@ -36,7 +43,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// use human_repr::HumanRepr;
     /// assert_eq!("160 ms", 0.1599999.human_duration());
     /// ```
-    fn human_duration(self) -> String;
+    fn human_duration(self) -> HumanDuration;
 
     /// Generate a beautiful human-readable throughput, supporting per-day (`/d`), per-hour (`/h`),
     /// per-month (`/m`), and per-sec (`/s`).
@@ -46,7 +53,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// use human_repr::HumanRepr;
     /// assert_eq!("1.2 Mcoins/s", 1234567.8.human_throughput("coins"));
     /// ```
-    fn human_throughput(self, unit: impl AsRef<str>) -> String;
+    fn human_throughput<T>(self, unit: T) -> HumanThroughput<T>;
 
     /// Generate a beautiful human-readable throughput, using `"B"` as the unit.
     ///
@@ -56,7 +63,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     /// use human_repr::HumanRepr;
     /// assert_eq!("1.2 MB/s", 1234567.8.human_throughput_bytes());
     /// ```
-    fn human_throughput_bytes(self) -> String {
+    fn human_throughput_bytes(self) -> HumanThroughput<&'static str> {
         self.human_throughput(BYTES)
     }
 }
@@ -64,14 +71,14 @@ pub trait HumanRepr: sealed::Sealed + Sized {
 macro_rules! impl_trait {
     {$($t:ty),+} => {$(
         impl HumanRepr for $t {
-            fn human_count(self, unit: impl AsRef<str>) -> String {
-                human_count::conv(self as f64, unit.as_ref())
+            fn human_count<T>(self, unit: T) -> HumanCount<T> {
+                HumanCount(self as f64, unit)
             }
-            fn human_duration(self) -> String {
-                human_duration::conv(self as f64)
+            fn human_duration(self) -> HumanDuration {
+                HumanDuration(self as f64)
             }
-            fn human_throughput(self, unit: impl AsRef<str>) -> String {
-                human_throughput::conv(self as f64, unit.as_ref())
+            fn human_throughput<T>(self, unit: T) -> HumanThroughput<T> {
+                HumanThroughput(self as f64, unit)
             }
         }
     )+}

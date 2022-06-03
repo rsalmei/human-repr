@@ -1,4 +1,5 @@
-use super::{rounded, HumanRepr, SPACE};
+use super::{rounded, HumanRepr, HumanThroughput, SPACE};
+use std::fmt;
 
 const SPEC: &[(f64, &str, usize)] = &[
     (24., "/d", 2),
@@ -7,18 +8,23 @@ const SPEC: &[(f64, &str, usize)] = &[
     // "/s" in code.
 ];
 
-pub fn conv(mut val: f64, unit: &str) -> String {
-    val *= 60. * 60. * 24.;
-    for &(size, scale, dec) in SPEC {
-        match rounded(val, dec) {
-            r if r.abs() >= size => val /= size,
-            r if r.fract() == 0. => return format!("{r:.0}{SPACE}{unit}{scale}"),
-            r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{unit}{scale}"),
-            r => return format!("{r:.dec$}{SPACE}{unit}{scale}"),
+impl<T: AsRef<str>> fmt::Display for HumanThroughput<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let (mut val, unit) = (self.0, self.1.as_ref());
+        val *= 60. * 60. * 24.;
+        for &(size, scale, dec) in SPEC {
+            match rounded(val, dec) {
+                r if r.abs() >= size => val /= size,
+                r if r.fract() == 0. => return write!(f, "{r:.0}{SPACE}{unit}{scale}"),
+                r if (r * 10.).fract() == 0. => return write!(f, "{r:.1}{SPACE}{unit}{scale}"),
+                r => return write!(f, "{r:.dec$}{SPACE}{unit}{scale}"),
+            }
         }
-    }
 
-    format!("{}/s", val.human_count(unit))
+        write!(f, "{}/s", val.human_count(unit))
+    }
+}
+
 }
 
 #[cfg(test)]

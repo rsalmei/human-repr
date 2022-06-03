@@ -1,4 +1,5 @@
-use super::{rounded, SPACE};
+use super::{rounded, HumanDuration, SPACE};
+use std::fmt;
 
 const SPEC: &[(f64, f64, &str, usize)] = &[
     (1e3, 1e3, "ns", 1),
@@ -8,25 +9,30 @@ const SPEC: &[(f64, f64, &str, usize)] = &[
     // 00:01:00 and beyond in code.
 ];
 
-pub fn conv(mut val: f64) -> String {
-    val *= 1e9;
-    for &(size, next, scale, dec) in SPEC {
-        match rounded(val, dec) {
-            r if r.abs() >= size => val /= next,
-            r if r.fract() == 0. => return format!("{r:.0}{SPACE}{scale}"),
-            r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{scale}"),
-            r => return format!("{r:.dec$}{SPACE}{scale}"),
+impl fmt::Display for HumanDuration {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut val = self.0 * 1e9;
+        for &(size, next, scale, dec) in SPEC {
+            match rounded(val, dec) {
+                r if r.abs() >= size => val /= next,
+                r if r.fract() == 0. => return write!(f, "{r:.0}{SPACE}{scale}"),
+                r if (r * 10.).fract() == 0. => return write!(f, "{r:.1}{SPACE}{scale}"),
+                r => return write!(f, "{r:.dec$}{SPACE}{scale}"),
+            }
         }
-    }
 
-    val = val.round();
-    let m = val / 60.;
-    format!(
-        "{}:{:02}:{:02}",
-        (m / 60.).trunc(),
-        (m % 60.).trunc(),
-        (val % 60.).trunc()
-    )
+        val = val.round();
+        let m = val / 60.;
+        write!(
+            f,
+            "{}:{:02}:{:02}",
+            (m / 60.).trunc(),
+            (m % 60.).trunc(),
+            (val % 60.).trunc()
+        )
+    }
+}
+
 }
 
 #[cfg(test)]

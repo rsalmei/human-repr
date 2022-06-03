@@ -1,4 +1,5 @@
-use super::{rounded, SPACE};
+use super::{rounded, HumanCount, SPACE};
+use std::fmt;
 
 // Not enabling any optional features gets: SI symbols, divisor is 1000, and with space.
 const SPEC: &[&str] = {
@@ -16,17 +17,22 @@ const DIVISOR: f64 = {
     }
 };
 
-pub fn conv(mut val: f64, unit: &str) -> String {
-    for (&scale, &dec) in SPEC.iter().zip(DECIMALS) {
-        match rounded(val, dec) {
-            r if r.abs() >= DIVISOR => val /= DIVISOR,
-            r if r.fract() == 0. => return format!("{r:.0}{SPACE}{scale}{unit}"),
-            r if (r * 10.).fract() == 0. => return format!("{r:.1}{SPACE}{scale}{unit}"),
-            r => return format!("{r:.dec$}{SPACE}{scale}{unit}"),
+impl<T: AsRef<str>> fmt::Display for HumanCount<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let (mut val, unit) = (self.0, self.1.as_ref());
+        for (&scale, &dec) in SPEC.iter().zip(DECIMALS) {
+            match rounded(val, dec) {
+                r if r.abs() >= DIVISOR => val /= DIVISOR,
+                r if r.fract() == 0. => return write!(f, "{r:.0}{SPACE}{scale}{unit}"),
+                r if (r * 10.).fract() == 0. => return write!(f, "{r:.1}{SPACE}{scale}{unit}"),
+                r => return write!(f, "{r:.dec$}{SPACE}{scale}{unit}"),
+            }
         }
-    }
 
-    format!("{val:.2}{SPACE}+{unit}")
+        write!(f, "{val:.2}{SPACE}+{unit}")
+    }
+}
+
 }
 
 #[cfg(test)]
