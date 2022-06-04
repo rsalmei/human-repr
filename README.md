@@ -7,22 +7,7 @@
 
 ## What it does
 
-Easily generate human-readable descriptions directly on primitive numbers, of several kinds:
-- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (optional IEC and "mixed" ones, see Rust features);
-- durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), minutes (`[M]M:SS`), and even hours (`[H]H:MM:SS`);
-- throughputs, supporting per-day (`/d`), per-hour (`/h`), per-minute (`/m`), and per-second (`/s`).
-
-It does not use any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns to generate a representation! (criterion benchmarks inside)
-<br>In the new version 0.4, it even does not allocate Strings anymore! I've returned structs that implement [`std::fmt::Display`], so you can now print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do 😜
-
-They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
-`f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`.
-
-The `unit` parameter some methods refer to means the entity you're dealing with, like bytes, actions, iterations, errors, whatever! Just send that text, and you're good to go!
-<br>Bytes have dedicated methods for convenience.
-
-## Examples 
-
+Easily generate several kinds of human-readable descriptions, directly on primitive numbers:
 ```rust
 use human_repr::HumanRepr;
 
@@ -36,10 +21,25 @@ assert_eq!("10 ms", 0.01.human_duration());
 assert_eq!("1:14:48", 4488.395.human_duration());
 
 // throughputs (bytes or anything)
+// the divisions are just for clarity, they show the very concept of throughput: # of items per amount of time.
 assert_eq!("1.2 MB/s", (1234567. / 1.).human_throughput_bytes());
-assert_eq!("6.1 tests/m", (10. / 99.).human_throughput("tests"));
+assert_eq!("6.1 tests/m", (8. / 79.).human_throughput("tests").to_string());
 assert_eq!("9 errors/d", (125. / 1200000.).human_throughput("errors"));
 ```
+
+This lib implements a whole suite of 
+- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (optional IEC and "mixed" ones, see Rust features);
+- durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), minutes (`M:SS`), and even hours (`H:MM:SS`);
+- throughputs, supporting per day (`/d`), per hour (`/h`), per minute (`/m`), and per second (`/s`).
+
+It does not use any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns to generate a representation! (criterion benchmarks inside)
+<br>Since the version 0.4, it does not allocate any Strings anymore! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
+
+They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
+`f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`.
+
+The `unit` parameter some methods refer to means the entity you're dealing with, like bytes, actions, iterations, errors, whatever! Just send that text, and you're good to go!
+<br>Bytes have dedicated methods for convenience.
 
 ## How to use it
 
@@ -49,24 +49,19 @@ Add this dependency to your Cargo.toml file:
 human-repr = "0"
 ```
 
-Use the trait:
+Then just use the trait and that's it! You can now call on any number:
 
-```rust, no_run
+```rust
 use human_repr::HumanRepr;
-```
 
-That's it! You can now call on any number:
+3000_u16.human_count("bytes");
+-5i8.human_count_bytes();
 
-```rust, no_run
-# use human_repr::HumanRepr;
-# let num = 123;
-num.human_count("unit");
-num.human_count_bytes();
+4244.32_f32.human_duration();
+0.000000000004432_f64.human_duration();
 
-num.human_duration();
-
-num.human_throughput("unit");
-num.human_throughput_bytes();
+8987_isize.human_throughput("transactions");
+93321_usize.human_throughput_bytes();
 ```
 
 ## Rust features:
@@ -80,7 +75,7 @@ By default, `human-repr` will use SI with `1000` divisor, and the prefixes: `k`,
 <br>You can modify this by enabling optional features:
 - `iec` => use IEC instead of SI: `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, `Ei`, `Zi`, `Yi` (implies `1024`)
 - `1024` => use `1024` divisor, but if `iec` is not enabled, use prefixes: `K`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (note the upper 'K')
-- `nospace` => remove the space between values and scales/units everywhere: `48GB` instead of `48 GB`, `15.6µs` instead of `15.6 µs`, and `12.4 B/m` instead of `12.4 B/m`
+- `nospace` => remove the space between values and scales/units everywhere: `48GB` instead of `48 GB`, `15.6µs` instead of `15.6 µs`, and `12.4kB/s` instead of `12.4 kB/s`
 
 ## The human duration magic
 
@@ -92,8 +87,9 @@ So what I do is: round values to at most two decimal places (larger scales have 
 
 The human duration scale changes seamlessly from nanoseconds to hours!
   - values smaller than 60 seconds are always rendered as `D.D[D] scale`, with one or two decimals;
-  - `.0` and `.00` are efficiently not generated (no `trim` followed by `to_owned` for example), it is handled directly in the format arguments;
-  - from 1 minute onward it changes to "H:MM:SS".
+  - `.0` and `.00` are efficiently not generated instead of removed from the output -> it is handled directly in the format arguments;
+  - from 1 minute onward it changes to "M:SS";
+  - from 1 hour onward it changes to "H:MM:SS".
 
 ## The human throughput magic
 
@@ -107,9 +103,9 @@ It doesn't help much even if we divide the duration by the number of items: `947
 To make some sense of it we now need to multiply that by 3600 (seconds in an hour) to get `0.38` per hour, which is much better, and again by 24 (hours in a day) to finally get `9.12` per day!! Now we know how fast that process was! \o/
 <br>As you see, it's not easy at all for our brains to estimate that...
 
-The human throughput scale changes seamlessly from per-second to per-day!
+The human throughput scale changes seamlessly from per second to per day!
   - `.0` and `.00` are efficiently not generated too, much like the duration magic;
-  - it also automatically inserts SI prefixes when in the fastest scale /second, so we get `2.4 MB/s` or `6.42 Gitems/s` 👍
+  - it also automatically inserts SI prefixes when in the fastest scale (per second), so we get `2.4 MB/s` or `6.42 Gitems/s` 👍
 
 ## The human count magic
 
@@ -118,6 +114,7 @@ Oh, this is the simplest of them all! I just continually divide by the divisor (
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
+- 0.6.x Jun 04, 2022: improve signed support with new `ops::Neg` impl
 - 0.5.x Jun 03, 2022: new minutes representation M:SS, between seconds and complete H:MM:SS
 - 0.4.x Jun 03, 2022: even faster implementation, which does not do any String allocations
 - 0.3.x Jun 01, 2022: support for a new group of prefixes for `1024` only (without `iec`)
