@@ -1,5 +1,5 @@
 use super::{rounded, HumanDuration, SPACE};
-use std::fmt;
+use std::{fmt, ops};
 
 const SPEC: &[(f64, f64, &str, usize)] = &[
     (1e3, 1e3, "ns", 1),
@@ -48,6 +48,14 @@ impl PartialEq<&str> for HumanDuration {
     }
 }
 
+impl ops::Neg for HumanDuration {
+    type Output = HumanDuration;
+
+    fn neg(self) -> Self::Output {
+        HumanDuration(-self.0)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::HumanRepr;
@@ -55,12 +63,12 @@ mod tests {
     #[test]
     fn operation() {
         assert_eq!("1 s", 1.human_duration());
-        assert_eq!("-1 s", (-1).human_duration());
+        assert_eq!("-1 s", -1.human_duration());
         assert_eq!("1.2 ns", 0.00000000123.human_duration());
         assert_eq!("1.8 ns", 0.0000000018.human_duration());
         assert_eq!("1.9 ns", 0.00000000185.human_duration());
         assert_eq!("1 µs", 0.000001.human_duration());
-        assert_eq!("-1 µs", (-0.000001).human_duration());
+        assert_eq!("-1 µs", -0.000001.human_duration());
         assert_eq!("1 µs", 0.000000999996.human_duration());
         assert_eq!("10 µs", 0.00001.human_duration());
         assert_eq!("15.6 µs", 0.0000156.human_duration());

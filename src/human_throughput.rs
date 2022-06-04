@@ -1,5 +1,5 @@
 use super::{rounded, HumanRepr, HumanThroughput, SPACE};
-use std::fmt;
+use std::{fmt, ops};
 
 const SPEC: &[(f64, &str, usize)] = &[
     (24., "/d", 2),
@@ -37,6 +37,14 @@ impl<T: AsRef<str>> PartialEq<&str> for HumanThroughput<T> {
     }
 }
 
+impl<T> ops::Neg for HumanThroughput<T> {
+    type Output = HumanThroughput<T>;
+
+    fn neg(self) -> Self::Output {
+        HumanThroughput(-self.0, self.1)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::HumanRepr;
@@ -44,7 +52,7 @@ mod tests {
     #[test]
     fn operation() {
         assert_eq!("1 B/s", 1.human_throughput_bytes());
-        assert_eq!("-1 B/s", (-1.).human_throughput_bytes());
+        assert_eq!("-1 B/s", -1.human_throughput_bytes());
         assert_eq!("1.2 MB/s", (1234567. / 1.).human_throughput_bytes());
         assert_eq!("10 B/s", (10. / 1.).human_throughput_bytes());
         assert_eq!("30 B/m", (1. / 2.).human_throughput_bytes());

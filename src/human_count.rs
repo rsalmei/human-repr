@@ -1,5 +1,5 @@
 use super::{rounded, HumanCount, SPACE};
-use std::fmt;
+use std::{fmt, ops};
 
 // Not enabling any optional features gets: SI symbols, divisor is 1000, and with space.
 const SPEC: &[&str] = {
@@ -45,6 +45,14 @@ impl<T: AsRef<str>> PartialEq<&str> for HumanCount<T> {
     }
 }
 
+impl<T> ops::Neg for HumanCount<T> {
+    type Output = HumanCount<T>;
+
+    fn neg(self) -> Self::Output {
+        HumanCount(-self.0, self.1)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::HumanRepr;
@@ -55,9 +63,9 @@ mod tests {
         assert_eq!("123.5 kB", 123456_u64.human_count_bytes());
         assert_eq!("23 B", 23u8.human_count_bytes());
         assert_eq!("23 B", 23i8.human_count_bytes());
-        assert_eq!("-23 B", (-23i8).human_count_bytes());
+        assert_eq!("-23 B", -23i8.human_count_bytes());
         assert_eq!("1 kB", 1025u16.human_count_bytes());
-        assert_eq!("-1 kB", (-1025i16).human_count_bytes());
+        assert_eq!("-1 kB", -1025i16.human_count_bytes());
         assert_eq!("43.2 MB", 43214321u32.human_count_bytes());
         assert_eq!("23.4 GB", 23403454432_u64.human_count_bytes());
         assert_eq!("23.43 GB", 23433454432_u64.human_count_bytes());
