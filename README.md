@@ -7,36 +7,50 @@
 
 ## What it does
 
-Easily generate several kinds of human-readable descriptions, directly on primitive numbers:
+Easily generate several kinds of human-readable descriptions, directly on primitive numbers or [`Durations`](`std::time::Duration`):
+
 ```rust
 use human_repr::HumanRepr;
 
-// counts (bytes or anything)
+// counts (bytes or any other unit)
 assert_eq!("43.2 MB", 43214321_u32.human_count_bytes());
 assert_eq!("123.5 kPackets", 123456_u64.human_count("Packets"));
 
-// durations
+// primitive durations
 assert_eq!("15.6 µs", 0.0000156.human_duration());
 assert_eq!("10 ms", 0.01.human_duration());
+assert_eq!("3.44 s", 3.435999.human_duration());
+assert_eq!("19:20.4", 1160.36.human_duration());
 assert_eq!("1:14:48", 4488.395.human_duration());
 
-// throughputs (bytes or anything)
-// the divisions are just for clarity, they show the very concept of throughput: # of items per amount of time.
+// throughputs (bytes or any other unit)
+// the divisions below are just for the sake of clarity, 
+// they show the very concept of a "throughput": the number of items per amount of time.
 assert_eq!("1.2 MB/s", (1234567. / 1.).human_throughput_bytes());
 assert_eq!("6.1 tests/m", (8. / 79.).human_throughput("tests").to_string());
 assert_eq!("9 errors/d", (125. / 1200000.).human_throughput("errors"));
 ```
 
-This lib implements a whole suite of 
+```rust
+use human_repr::HumanReprDuration;
+use std::time::Duration;
+
+assert_eq!("15.6 µs", Duration::new(0, 15_600).human_duration());
+assert_eq!("10 ms", Duration::from_secs_f64(0.01).human_duration());
+assert_eq!("1:14:48", Duration::new(4488, 395_000_000).human_duration());
+```
+
+This lib implements a whole suite of:
 - counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (optional IEC and "mixed" ones, see Rust features);
 - durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), minutes (`M:SS`), and even hours (`H:MM:SS`);
 - throughputs, supporting per day (`/d`), per hour (`/h`), per minute (`/m`), and per second (`/s`).
 
 It does not use any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns to generate a representation! (criterion benchmarks inside)
-<br>Since the version 0.4, it does not allocate any Strings anymore! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
+<br>Since version 0.4, it does not allocate any Strings anymore! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
 
 They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
 `f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`.
+<br>Since version 0.7, [`Duration`](`std::time::Duration`) is also supported! Yes yes, I know it does have a [`Debug`](`std::fmt::Debug`) impl that does almost this, but it is not very human: `Duration::new(0, 14184293)` comes out as `14.184293ms`, this crate would return `14.2 ms`. And of course, the minutes and hours views... `Duration::new(1000000, 1)` gives the horrendous `1000000.000000001s`, instead of `277:46:40` 👍
 
 The `unit` parameter some methods refer to means the entity you're dealing with, like bytes, actions, iterations, errors, whatever! Just send that text, and you're good to go!
 <br>Bytes have dedicated methods for convenience.
@@ -49,7 +63,7 @@ Add this dependency to your Cargo.toml file:
 human-repr = "0"
 ```
 
-Then just use the trait and that's it! You can now call on any number:
+Then just use the main trait and that's it! You can now call on any number:
 
 ```rust
 use human_repr::HumanRepr;
@@ -62,6 +76,14 @@ use human_repr::HumanRepr;
 
 8987_isize.human_throughput("transactions");
 93321_usize.human_throughput_bytes();
+```
+
+For durations, use the specific trait:
+
+```rust
+use human_repr::HumanReprDuration;
+
+std::time::Duration::from_secs_f64(0.00432).human_duration();
 ```
 
 ## Rust features:
@@ -114,6 +136,7 @@ Oh, this is the simplest of them all! I just continually divide by the divisor (
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
+- 0.7.x Jun 04, 2022: support for std::time::Duration via a new trait `HumanReprDuration`, include one decimal in the minutes representation
 - 0.6.x Jun 04, 2022: improve signed support with new `ops::Neg` impl
 - 0.5.x Jun 03, 2022: new minutes representation M:SS, between seconds and complete H:MM:SS
 - 0.4.x Jun 03, 2022: even faster implementation, which does not do any String allocations
