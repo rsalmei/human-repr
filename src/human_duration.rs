@@ -71,7 +71,8 @@ impl HumanReprDuration for Duration {
 
 #[cfg(test)]
 mod tests {
-    use crate::HumanRepr;
+    use crate::{HumanRepr, HumanReprDuration};
+    use std::time::Duration;
 
     #[test]
     fn operation() {
@@ -98,12 +99,49 @@ mod tests {
         assert_eq!("59.9 s", 59.9.human_duration());
         assert_eq!("59.99 s", 59.99.human_duration());
         assert_eq!("1:00", 59.995.human_duration());
-        assert_eq!("1:08", 68.09.human_duration());
-        assert_eq!("19:21", 1160.99.human_duration());
+        assert_eq!("1:08.1", 68.09.human_duration());
+        assert_eq!("19:20.4", 1160.36.human_duration());
         assert_eq!("1:04:48", 3888.395.human_duration());
         assert_eq!("2:46:40", 10000u16.human_duration());
         assert_eq!("27:46:40", 100000i64.human_duration());
         assert_eq!("277:46:40", 1000000isize.human_duration());
+    }
+
+    #[test]
+    fn flexibility() {
+        macro_rules! d {
+            {$f:literal} => {
+                Duration::from_secs_f64($f)
+            };
+            {$s:literal, $n:literal} => {
+                Duration::new($s, $n)
+            };
+        }
+
+        assert_eq!("1 s", d!(1.).human_duration().to_string());
+        assert_eq!("1.5 s", d!(1.5).human_duration().to_string());
+        assert_eq!("1 ns", d!(0.00000000123).human_duration().to_string());
+        assert_eq!("1 ns", d!(0.00000000185).human_duration().to_string());
+        assert_eq!("1 ns", d!(0, 1).human_duration().to_string());
+        assert_eq!("999 ns", d!(0.000000999999999).human_duration().to_string());
+        assert_eq!("1 µs", d!(0, 1000).human_duration().to_string());
+        assert_eq!("10 µs", d!(0, 10000).human_duration().to_string());
+        assert_eq!("15.6 µs", d!(0, 15600).human_duration().to_string());
+        assert_eq!("10 ms", d!(0.01).human_duration().to_string());
+        assert_eq!("14.1 ms", d!(0.0141233333333).human_duration().to_string());
+        assert_eq!("110 ms", d!(0, 110000000).human_duration().to_string());
+        assert_eq!("801.5 ms", d!(0.8015).human_duration().to_string());
+        assert_eq!("3.43 s", d!(3.434999).human_duration().to_string());
+        assert_eq!("59 s", d!(59.0).human_duration().to_string());
+        assert_eq!("59.9 s", d!(59.9).human_duration().to_string());
+        assert_eq!("59.99 s", d!(59.99).human_duration().to_string());
+        assert_eq!("1:00", d!(60, 0).human_duration().to_string());
+        assert_eq!("1:08.1", d!(68.09).human_duration().to_string());
+        assert_eq!("19:20.4", d!(1160, 350000000).human_duration().to_string());
+        assert_eq!("1:04:48", d!(3888.395).human_duration().to_string());
+        assert_eq!("2:46:40", d!(10000.).human_duration().to_string());
+        assert_eq!("27:46:40", d!(100000.).human_duration().to_string());
+        assert_eq!("277:46:40", d!(1000000, 1).human_duration().to_string());
     }
 
     #[test]
