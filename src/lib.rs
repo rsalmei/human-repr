@@ -37,7 +37,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     }
 
     /// Generate a beautiful human-readable duration, supporting nanos (`ns`), millis (`ms`),
-    /// micros (`µs`), seconds (`s`), and even hour-minute-seconds (`HH:MM:SS`).
+    /// micros (`µs`), seconds (`s`), minutes (`M:SS`), and even hours (`H:MM:SS`).
     ///
     /// ```
     /// use human_repr::HumanRepr;
@@ -66,6 +66,20 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     fn human_throughput_bytes(self) -> HumanThroughput<&'static str> {
         self.human_throughput(BYTES)
     }
+}
+
+pub trait HumanReprDuration: sealed::Sealed + Sized {
+    /// Generate a beautiful human-readable duration, supporting nanos (`ns`), millis (`ms`),
+    /// micros (`µs`), seconds (`s`), minutes (`M:SS`), and even hours (`H:MM:SS`).
+    ///
+    /// ```
+    /// use human_repr::HumanReprDuration;
+    /// use std::time::Duration;
+    ///
+    /// let d = Duration::from_secs_f64(0.1599999);
+    /// assert_eq!("160 ms", d.human_duration());
+    /// ```
+    fn human_duration(self) -> HumanDuration;
 }
 
 macro_rules! impl_trait {

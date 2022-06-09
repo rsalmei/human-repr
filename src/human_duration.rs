@@ -1,4 +1,5 @@
-use super::{rounded, HumanDuration, SPACE};
+use super::{rounded, HumanDuration, HumanRepr, HumanReprDuration, SPACE};
+use std::time::Duration;
 use std::{fmt, ops};
 
 const SPEC: &[(f64, f64, &str, usize)] = &[
@@ -57,6 +58,14 @@ impl ops::Neg for HumanDuration {
 
     fn neg(self) -> Self::Output {
         HumanDuration(-self.0)
+    }
+}
+
+impl super::sealed::Sealed for Duration {}
+
+impl HumanReprDuration for Duration {
+    fn human_duration(self) -> HumanDuration {
+        self.as_secs_f64().human_duration()
     }
 }
 
