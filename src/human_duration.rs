@@ -6,7 +6,8 @@ const SPEC: &[(f64, f64, &str, usize)] = &[
     (1e3, 1e3, "µs", 1), // uses non-ASCII “µs” suffix.
     (1e3, 1e3, "ms", 1),
     (60., 1., "s", 2),
-    // 00:01:00 and beyond in code.
+    // 1:01.1 (minutes in code, 1 decimal).
+    // 1:01:01 (hours in code, 0 decimal).
 ];
 
 impl fmt::Display for HumanDuration {
@@ -21,10 +22,13 @@ impl fmt::Display for HumanDuration {
             }
         }
 
-        val = val.round();
+        val = rounded(val, 1);
         let m = val / 60.;
         match m < 60. {
-            true => write!(f, "{}:{:02}", m.trunc(), (val % 60.).trunc()),
+            true => match val % 60. {
+                s if s.fract() == 0. => write!(f, "{}:{:02}", m.trunc(), s.trunc()),
+                s => write!(f, "{}:{:04}", m.trunc(), rounded(s, 1)),
+            },
             false => write!(
                 f,
                 "{}:{:02}:{:02}",
