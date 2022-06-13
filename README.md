@@ -7,7 +7,7 @@
 
 ## What it does
 
-Easily generate several kinds of human-readable descriptions, directly on primitive numbers or [`Durations`](`std::time::Duration`):
+Easily generate several kinds of human-readable descriptions, directly on primitive numbers:
 
 ```rust
 use human_repr::HumanRepr;
@@ -24,12 +24,14 @@ assert_eq!("19:20.4", 1160.36.human_duration());
 assert_eq!("1:14:48", 4488.395.human_duration());
 
 // throughputs (bytes or any other unit)
-// the divisions below are just for the sake of clarity, 
-// they show the very concept of a "throughput": the number of items per amount of time.
+// the divisions below are just for the sake of clarity, they show 
+// the very concept of a "throughput": number of items per time.
 assert_eq!("1.2 MB/s", (1234567. / 1.).human_throughput_bytes());
-assert_eq!("6.1 tests/m", (8. / 79.).human_throughput("tests").to_string());
+assert_eq!("6.1 tests/m", (8. / 79.).human_throughput("tests"));
 assert_eq!("9 errors/d", (125. / 1200000.).human_throughput("errors"));
 ```
+
+And even on [`Duration`](`std::time::Duration`) instances:
 
 ```rust
 use human_repr::HumanReprDuration;
@@ -45,12 +47,12 @@ This lib implements a whole suite of:
 - durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), minutes (`M:SS`), and even hours (`H:MM:SS`);
 - throughputs, supporting per day (`/d`), per hour (`/h`), per minute (`/m`), and per second (`/s`).
 
-It does not use any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns to generate a representation! (criterion benchmarks inside)
-<br>Since version 0.4, it does not allocate any Strings anymore! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
+This crate doesn't have any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns to generate a representation! (criterion benchmarks inside)
+<br>Since version 0.4, it does not even allocate any Strings! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
 
 They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
 `f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`.
-<br>Since version 0.7, [`Duration`](`std::time::Duration`) is also supported! Yes yes, I know it does have a [`Debug`](`std::fmt::Debug`) impl that does almost this, but it is not very human: `Duration::new(0, 14184293)` comes out as `14.184293ms`, this crate would return `14.2 ms`. And of course, the minutes and hours views... `Duration::new(1000000, 1)` gives the horrendous `1000000.000000001s`, instead of `277:46:40` 👍
+<br>Since version 0.7, [`Duration`](`std::time::Duration`) is also supported! Yes yes, I know it does have a [`Debug`](`std::fmt::Debug`) impl that does almost this, but it is not very _human_: `Duration::new(0, 14184293)` comes out as `14.184293ms`, this crate would return `14.2 ms`. And of course, the minutes and hours views... `Duration::new(10000, 1)` gives the horrendous `10000.000000001s`, instead of `2:46:40` 👍
 
 The `unit` parameter some methods refer to means the entity you're dealing with, like bytes, actions, iterations, errors, whatever! Just send that text, and you're good to go!
 <br>Bytes have dedicated methods for convenience.
@@ -93,11 +95,12 @@ According to the SI standard, there are 1000 bytes in a `kilobyte`.
 
 Be careful to not render IEC quantities with SI scaling, which would be incorrect. But I still support it, if you really want to ;)
 
-By default, `human-repr` will use SI with `1000` divisor, and the prefixes: `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y`.
-<br>You can modify this by enabling optional features:
-- `iec` => use IEC instead of SI: `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, `Ei`, `Zi`, `Yi` (implies `1024`)
-- `1024` => use `1024` divisor, but if `iec` is not enabled, use prefixes: `K`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (note the upper 'K')
-- `nospace` => remove the space between values and scales/units everywhere: `48GB` instead of `48 GB`, `15.6µs` instead of `15.6 µs`, and `12.4kB/s` instead of `12.4 kB/s`
+By default, `human-repr` will use SI, `1000` divisor, and `space` between values and scales/units. SI uses prefixes: `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y`.
+
+This crate supports these optional features:
+- `iec` => use IEC instead of SI: `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, `Ei`, `Zi`, `Yi` (implies `1024`);
+- `1024` => use `1024` divisor — if `iec` is not enabled, use prefixes: `K`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (note the upper 'K');
+- `space` \[default\] => include a space between values and scales/units everywhere: `48 B` instead of `48B`, `15.6 µs` instead of `15.6µs`, and `12.4 kB/s` instead of `12.4kB/s`.
 
 ## The human duration magic
 
@@ -136,6 +139,7 @@ Oh, this is the simplest of them all! I just continually divide by the divisor (
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
+- 0.8.x Jun 12, 2022: change `nospace` feature to `space`, to avoid the negative logic (it is now default, to maintain behavior)
 - 0.7.x Jun 04, 2022: support for std::time::Duration via a new trait `HumanReprDuration`, include one decimal in the minutes representation
 - 0.6.x Jun 04, 2022: improve signed support with new `ops::Neg` impl
 - 0.5.x Jun 03, 2022: new minutes representation M:SS, between seconds and complete H:MM:SS
