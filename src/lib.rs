@@ -110,9 +110,9 @@ mod sealed {
 }
 
 const SPACE: &str = {
-    match cfg!(feature = "nospace") {
-        true => "",
-        false => " ",
+    match cfg!(feature = "space") {
+        true => " ",
+        false => "",
     }
 };
 
