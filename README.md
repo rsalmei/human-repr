@@ -108,7 +108,7 @@ I've used just one key concept in designing the human duration features: cleanli
 > `3.44 s` is more meaningful than `3.43584783784 s`, and `14.1 µs` is much, much nicer than `.0000141233333 s`.
 
 So what I do is: round values to at most two decimal places (larger scales have more decimals), and find the best scale to represent them, minimizing resulting values smaller than `1`. The search for the best scale considers even the rounding been applied!
-> `0.000999999` does not end up as `999.9 µs` (truncate) nor `1000.0 µs` (bad scale), it is auto-upgraded to the next one `1.0 ms`!
+> `0.000999999` does not end up as `999.9 µs` (truncate) nor `1000 µs` (bad scale), it is auto-upgraded to the next one `1 ms`!
 
 The human duration scale changes seamlessly from nanoseconds to hours!
   - values smaller than 60 seconds are always rendered as `D.D[D] scale`, with one or two decimals;
@@ -139,6 +139,7 @@ Oh, this is the simplest of them all! I just continually divide by the divisor (
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
+- 0.9.x Jun 22, 2022: do not use captured identifiers in format strings, to support much broader Rust versions instead of only >= 1.58
 - 0.8.x Jun 12, 2022: change `nospace` feature to `space`, to avoid the negative logic (it is now default, to maintain behavior)
 - 0.7.x Jun 04, 2022: support for std::time::Duration via a new trait `HumanReprDuration`, include one decimal in the minutes representation
 - 0.6.x Jun 04, 2022: improve signed support with new `ops::Neg` impl
