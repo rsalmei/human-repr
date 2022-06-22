@@ -23,13 +23,15 @@ impl<T: AsRef<str>> fmt::Display for HumanCount<T> {
         for (&scale, &dec) in SPEC.iter().zip(DECIMALS) {
             match rounded(val, dec) {
                 r if r.abs() >= DIVISOR => val /= DIVISOR,
-                r if r.fract() == 0. => return write!(f, "{r:.0}{SPACE}{scale}{unit}"),
-                r if (r * 10.).fract() == 0. => return write!(f, "{r:.1}{SPACE}{scale}{unit}"),
-                r => return write!(f, "{r:.dec$}{SPACE}{scale}{unit}"),
+                r if r.fract() == 0. => return write!(f, "{:.0}{}{}{}", r, SPACE, scale, unit),
+                r if (r * 10.).fract() == 0. => {
+                    return write!(f, "{:.1}{}{}{}", r, SPACE, scale, unit)
+                }
+                r => return write!(f, "{:.dec$}{}{}{}", r, SPACE, scale, unit, dec = dec),
             }
         }
 
-        write!(f, "{val:.2}{SPACE}+{unit}")
+        write!(f, "{:.2}{}+{}", val, SPACE, unit)
     }
 }
 

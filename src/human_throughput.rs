@@ -15,9 +15,11 @@ impl<T: AsRef<str>> fmt::Display for HumanThroughput<T> {
         for &(size, scale, dec) in SPEC {
             match rounded(val, dec) {
                 r if r.abs() >= size => val /= size,
-                r if r.fract() == 0. => return write!(f, "{r:.0}{SPACE}{unit}{scale}"),
-                r if (r * 10.).fract() == 0. => return write!(f, "{r:.1}{SPACE}{unit}{scale}"),
-                r => return write!(f, "{r:.dec$}{SPACE}{unit}{scale}"),
+                r if r.fract() == 0. => return write!(f, "{:.0}{}{}{}", r, SPACE, unit, scale),
+                r if (r * 10.).fract() == 0. => {
+                    return write!(f, "{:.1}{}{}{}", r, SPACE, unit, scale)
+                }
+                r => return write!(f, "{:.dec$}{}{}{}", r, SPACE, unit, scale, dec = dec),
             }
         }
 
