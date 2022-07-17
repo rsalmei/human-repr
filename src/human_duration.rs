@@ -41,6 +41,16 @@ impl fmt::Display for HumanDuration {
     }
 }
 
+impl fmt::Debug for HumanDuration {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("HumanDuration")
+            .field("val", &self.0)
+            .finish()?;
+        write!(f, " -> ")?;
+        <Self as fmt::Display>::fmt(self, f)
+    }
+}
+
 impl PartialEq<HumanDuration> for &str {
     fn eq(&self, other: &HumanDuration) -> bool {
         *self == &other.to_string()

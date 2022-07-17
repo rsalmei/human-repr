@@ -4,11 +4,8 @@ mod human_count;
 mod human_duration;
 mod human_throughput;
 
-#[derive(Debug)]
 pub struct HumanCount<T>(f64, T);
-#[derive(Debug)]
 pub struct HumanDuration(f64);
-#[derive(Debug)]
 pub struct HumanThroughput<T>(f64, T);
 
 const BYTES: &str = "B";

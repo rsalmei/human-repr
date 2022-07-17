@@ -35,6 +35,19 @@ impl<T: AsRef<str>> fmt::Display for HumanCount<T> {
     }
 }
 
+impl<T: AsRef<str>> fmt::Debug for HumanCount<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut ds = f.debug_struct("HumanCount");
+        ds.field("val", &self.0);
+        if !self.1.as_ref().is_empty() {
+            ds.field("unit", &self.1.as_ref());
+        }
+        ds.finish()?;
+        write!(f, " -> ")?;
+        <Self as fmt::Display>::fmt(self, f)
+    }
+}
+
 impl<T: AsRef<str>> PartialEq<HumanCount<T>> for &str {
     fn eq(&self, other: &HumanCount<T>) -> bool {
         *self == &other.to_string()
