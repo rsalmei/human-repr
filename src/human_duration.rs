@@ -86,30 +86,30 @@ mod tests {
 
     #[test]
     fn operation() {
-        assert_eq!("1 s", 1.human_duration());
-        assert_eq!("-1 s", -1.human_duration());
-        assert_eq!("1.2 ns", 0.00000000123.human_duration());
-        assert_eq!("1.8 ns", 0.0000000018.human_duration());
-        assert_eq!("1.9 ns", 0.00000000185.human_duration());
-        assert_eq!("1 µs", 0.000001.human_duration());
-        assert_eq!("-1 µs", -0.000001.human_duration());
-        assert_eq!("1 µs", 0.000000999996.human_duration());
-        assert_eq!("10 µs", 0.00001.human_duration());
-        assert_eq!("15.6 µs", 0.0000156.human_duration());
-        assert_eq!("10 ms", 0.01.human_duration());
-        assert_eq!("14.1 ms", 0.0141233333333.human_duration());
-        assert_eq!("1 ms", 0.000999999.human_duration());
-        assert_eq!("20 ms", 0.0199999.human_duration());
-        assert_eq!("110 ms", 0.1099999.human_duration());
-        assert_eq!("160 ms", 0.1599999.human_duration());
-        assert_eq!("801.5 ms", 0.8015.human_duration());
-        assert_eq!("3.43 s", 3.434999.human_duration());
-        assert_eq!("3.44 s", 3.435999.human_duration());
-        assert_eq!("59 s", 59.0.human_duration());
-        assert_eq!("59.9 s", 59.9.human_duration());
-        assert_eq!("59.99 s", 59.99.human_duration());
+        assert_eq!("1s", 1.human_duration());
+        assert_eq!("-1s", -1.human_duration());
+        assert_eq!("1ns", 0.00000000123.human_duration());
+        assert_eq!("2ns", 0.0000000018.human_duration());
+        assert_eq!("1µs", 0.000001.human_duration());
+        assert_eq!("-1µs", -0.000001.human_duration());
+        assert_eq!("1µs", 0.000000999996.human_duration());
+        assert_eq!("10µs", 0.00001.human_duration());
+        assert_eq!("15.6µs", 0.0000156.human_duration());
+        assert_eq!("10ms", 0.01.human_duration());
+        assert_eq!("14.1ms", 0.0141233333333.human_duration());
+        assert_eq!("1ms", 0.000999999.human_duration());
+        assert_eq!("20ms", 0.0199999.human_duration());
+        assert_eq!("110ms", 0.1099999.human_duration());
+        assert_eq!("160ms", 0.1599999.human_duration());
+        assert_eq!("801.5ms", 0.8015.human_duration());
+        assert_eq!("3.43s", 3.434999.human_duration());
+        assert_eq!("3.44s", 3.435999.human_duration());
+        assert_eq!("59s", 59.0.human_duration());
+        assert_eq!("59.9s", 59.9.human_duration());
+        assert_eq!("59.99s", 59.99.human_duration());
         assert_eq!("1:00", 59.995.human_duration());
         assert_eq!("1:08.1", 68.09.human_duration());
+        assert_eq!("2:05.8", 125.825.human_duration());
         assert_eq!("19:20.4", 1160.36.human_duration());
         assert_eq!("1:04:48", 3888.395.human_duration());
         assert_eq!("2:46:40", 10000u16.human_duration());
@@ -128,23 +128,23 @@ mod tests {
             };
         }
 
-        assert_eq!("1 s", d!(1.).human_duration());
-        assert_eq!("1.5 s", d!(1.5).human_duration());
-        assert_eq!("1 ns", d!(0.00000000123).human_duration());
-        assert_eq!("1 ns", d!(0.00000000185).human_duration());
-        assert_eq!("1 ns", d!(0, 1).human_duration());
-        assert_eq!("999 ns", d!(0.000000999999999).human_duration());
-        assert_eq!("1 µs", d!(0, 1000).human_duration());
-        assert_eq!("10 µs", d!(0, 10000).human_duration());
-        assert_eq!("15.6 µs", d!(0, 15600).human_duration());
-        assert_eq!("10 ms", d!(0.01).human_duration());
-        assert_eq!("14.1 ms", d!(0.0141233333333).human_duration());
-        assert_eq!("110 ms", d!(0, 110000000).human_duration());
-        assert_eq!("801.5 ms", d!(0.8015).human_duration());
-        assert_eq!("3.43 s", d!(3.434999).human_duration());
-        assert_eq!("59 s", d!(59.0).human_duration());
-        assert_eq!("59.9 s", d!(59.9).human_duration());
-        assert_eq!("59.99 s", d!(59.99).human_duration());
+        assert_eq!("1s", d!(1.).human_duration());
+        assert_eq!("1.5s", d!(1.5).human_duration());
+        assert_eq!("1ns", d!(0.00000000123).human_duration());
+        assert_eq!("1ns", d!(0.00000000185).human_duration());
+        assert_eq!("1ns", d!(0, 1).human_duration());
+        assert_eq!("999ns", d!(0.000000999999999).human_duration());
+        assert_eq!("1µs", d!(0, 1000).human_duration());
+        assert_eq!("10µs", d!(0, 10000).human_duration());
+        assert_eq!("15.6µs", d!(0, 15600).human_duration());
+        assert_eq!("10ms", d!(0.01).human_duration());
+        assert_eq!("14.1ms", d!(0.0141233333333).human_duration());
+        assert_eq!("110ms", d!(0, 110000000).human_duration());
+        assert_eq!("801.5ms", d!(0.8015).human_duration());
+        assert_eq!("3.43s", d!(3.434999).human_duration());
+        assert_eq!("59s", d!(59.0).human_duration());
+        assert_eq!("59.9s", d!(59.9).human_duration());
+        assert_eq!("59.99s", d!(59.99).human_duration());
         assert_eq!("1:00", d!(60, 0).human_duration());
         assert_eq!("1:08.1", d!(68.09).human_duration());
         assert_eq!("19:20.4", d!(1160, 350000000).human_duration());
@@ -157,8 +157,8 @@ mod tests {
     #[test]
     fn ownership() {
         let mut a = 0.01;
-        assert_eq!("10 ms", a.human_duration());
-        assert_eq!("10 ms", (&a).human_duration());
-        assert_eq!("10 ms", (&mut a).human_duration());
+        assert_eq!("10ms", a.human_duration());
+        assert_eq!("10ms", (&a).human_duration());
+        assert_eq!("10ms", (&mut a).human_duration());
     }
 }

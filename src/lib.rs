@@ -17,7 +17,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     ///
     /// ```
     /// use human_repr::HumanRepr;
-    /// assert_eq!("43.2 Mcoins", 43214321u32.human_count("coins"));
+    /// assert_eq!("4.2Mcoins", 4221432u32.human_count("coins"));
     /// ```
     fn human_count<T>(self, unit: T) -> HumanCount<T>;
 
@@ -27,7 +27,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     ///
     /// ```
     /// use human_repr::HumanRepr;
-    /// assert_eq!("43.2 MB", 43214321u32.human_count_bytes());
+    /// assert_eq!("4.2MB", 4221432u32.human_count_bytes());
     /// ```
     fn human_count_bytes(self) -> HumanCount<&'static str> {
         self.human_count(BYTES)
@@ -38,7 +38,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     ///
     /// ```
     /// use human_repr::HumanRepr;
-    /// assert_eq!("160 ms", 0.1599999.human_duration());
+    /// assert_eq!("160ms", 0.1599999.human_duration());
     /// ```
     fn human_duration(self) -> HumanDuration;
 
@@ -48,7 +48,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     ///
     /// ```
     /// use human_repr::HumanRepr;
-    /// assert_eq!("1.2 Mcoins/s", 1234567.8.human_throughput("coins"));
+    /// assert_eq!("1.2k°C/s", 1234.5.human_throughput("°C"));
     /// ```
     fn human_throughput<T>(self, unit: T) -> HumanThroughput<T>;
 
@@ -58,7 +58,7 @@ pub trait HumanRepr: sealed::Sealed + Sized {
     ///
     /// ```
     /// use human_repr::HumanRepr;
-    /// assert_eq!("1.2 MB/s", 1234567.8.human_throughput_bytes());
+    /// assert_eq!("1.2kB/s", 1234.5.human_throughput_bytes());
     /// ```
     fn human_throughput_bytes(self) -> HumanThroughput<&'static str> {
         self.human_throughput(BYTES)
@@ -74,7 +74,7 @@ pub trait HumanReprDuration: sealed::Sealed + Sized {
     /// use std::time::Duration;
     ///
     /// let d = Duration::from_secs_f64(0.1599999);
-    /// assert_eq!("160 ms", d.human_duration());
+    /// assert_eq!("160ms", d.human_duration());
     /// ```
     fn human_duration(self) -> HumanDuration;
 }

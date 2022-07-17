@@ -15,7 +15,7 @@ license = "MIT"
 [dependencies]
 
 [features]
-default = ["space"]
+default = []
 1024 = []
 iec = ["1024"]
 space = []
