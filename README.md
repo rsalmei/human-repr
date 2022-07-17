@@ -12,23 +12,26 @@ Easily generate several kinds of human-readable descriptions, directly on primit
 ```rust
 use human_repr::HumanRepr;
 
-// counts (bytes or any other unit)
-assert_eq!("43.2 MB", 43214321_u32.human_count_bytes());
-assert_eq!("123.5 kPackets", 123456_u64.human_count("Packets"));
+// counts (bare, bytes, or any custom unit)
+assert_eq!("43.21GB", 43214321123_u64.human_count_bytes());
+assert_eq!("123.5kPackets", 123456_u32.human_count("Packets"));
+assert_eq!("74.9M", 74893200.human_count_bare());
+assert_eq!("48°C", 48.human_count("°C"));
 
 // primitive durations
-assert_eq!("15.6 µs", 0.0000156.human_duration());
-assert_eq!("10 ms", 0.01.human_duration());
-assert_eq!("3.44 s", 3.435999.human_duration());
+assert_eq!("15.6µs", 0.0000156.human_duration());
+assert_eq!("10ms", 0.01.human_duration());
+assert_eq!("3.44s", 3.435999.human_duration());
 assert_eq!("19:20.4", 1160.36.human_duration());
 assert_eq!("1:14:48", 4488.395.human_duration());
 
-// throughputs (bytes or any other unit)
-// the divisions below are just for the sake of clarity, they show 
+// throughputs (bare, bytes, or any custom unit)
+assert_eq!("1.2MB/s", (1234567. / 1.).human_throughput_bytes());
+assert_eq!("6.1tests/m", (8. / 79.).human_throughput("tests"));
+assert_eq!("9/d", (125. / 1200000.).human_throughput_bare());
+assert_eq!("54°C/h", (24. / 1600.).human_throughput("°C"));
+// the divisions above are just for the sake of clarity: they show 
 // the very concept of a "throughput": number of items per time.
-assert_eq!("1.2 MB/s", (1234567. / 1.).human_throughput_bytes());
-assert_eq!("6.1 tests/m", (8. / 79.).human_throughput("tests"));
-assert_eq!("9 errors/d", (125. / 1200000.).human_throughput("errors"));
 ```
 
 And even on [`Duration`](`std::time::Duration`) instances:
@@ -37,24 +40,48 @@ And even on [`Duration`](`std::time::Duration`) instances:
 use human_repr::HumanReprDuration;
 use std::time::Duration;
 
-assert_eq!("15.6 µs", Duration::new(0, 15_600).human_duration());
-assert_eq!("10 ms", Duration::from_secs_f64(0.01).human_duration());
+assert_eq!("15.6µs", Duration::new(0, 15_600).human_duration());
+assert_eq!("10ms", Duration::from_secs_f64(0.01).human_duration());
 assert_eq!("1:14:48", Duration::new(4488, 395_000_000).human_duration());
 ```
 
-This lib implements a whole suite of:
-- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (optional IEC and "mixed" ones, see Rust features);
-- durations, supporting nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), minutes (`M:SS`), and even hours (`H:MM:SS`);
+This crate implements a whole suite of:
+- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (with optional IEC prefixes and "mixed" ones, see Rust features);
+- durations, supporting SI prefixes nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), minutes (`M:SS`), and even hours (`H:MM:SS`);
 - throughputs, supporting per day (`/d`), per hour (`/h`), per minute (`/m`), and per second (`/s`).
 
-This crate doesn't have any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns to generate a representation! (criterion benchmarks inside)
-<br>Since version 0.4, it does not even allocate any Strings! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
+This crate doesn't have any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns (checked with criterion benchmarks) to generate a representation!
+<br>Since version 0.4, I do not allocate any Strings! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
+<br>Since version 0.10, the [`Debug`](`std::fmt::Debug`) impl will show both the raw value and the final representation! Very, very cool.
+```rust
+use human_repr::HumanRepr;
+
+assert_eq!("HumanDuration { val: 1.56e-5 } -> 15.6µs", format!("{:?}", 0.0000156.human_duration()));
+assert_eq!(r#"HumanThroughput { val: 0.015, unit: "°C" } -> 54°C/h"#, format!("{:?}", 0.015.human_throughput("°C")));
+```
 
 They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
-`f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`.
-<br>Since version 0.7, [`Duration`](`std::time::Duration`) is also supported! Yes yes, I know it does have a [`Debug`](`std::fmt::Debug`) impl that does almost this, but it is not very _human_: `Duration::new(0, 14184293)` comes out as `14.184293ms`, this crate would return `14.2 ms`. And of course, the minutes and hours views... `Duration::new(10000, 1)` gives the horrendous `10000.000000001s`, instead of `2:46:40` 👍
+`f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`, as well as [`Duration`](`std::time::Duration`) types.
 
-The `unit` parameter some methods refer to means the entity you're dealing with, like bytes, actions, iterations, errors, whatever! Just send that text, and you're good to go!
+> Yes yes, I know `Duration`s do have a [`Debug`](`std::fmt::Debug`) impl that does something like this, but it is not very _human_:
+> ```rust
+> use human_repr::HumanReprDuration;
+> use std::time::Duration;
+> 
+> assert_eq!("14.184293ms", format!("{:?}", Duration::new(0, 14184293))); // yikes!
+> assert_eq!("14.2ms", Duration::new(0, 14184293).human_duration()); // 😃👍
+> ```
+> 
+> And of course, there are minutes and hours views...
+> ```rust
+> use human_repr::HumanReprDuration;
+> use std::time::Duration;
+> 
+> assert_eq!("10000.000000001s", format!("{:?}", Duration::new(10000, 1))); // horrendous!
+> assert_eq!("2:46:40", Duration::new(10000, 1).human_duration()); // 😃👍
+> ```
+
+The `unit` parameter some methods make available means the entity you're dealing with, like "bytes", "actions", "iterations", "errors", whatever! You can send either the whole unit name, or a shortened one like "B", "it", etc, or even an empty str!
 <br>Bytes have dedicated methods for convenience.
 
 ## How to use it
@@ -65,7 +92,7 @@ Add this dependency to your Cargo.toml file:
 human-repr = "0"
 ```
 
-Then just use the main trait and that's it! You can now call on any number:
+Then just use the main trait! You can now call on any number:
 
 ```rust
 use human_repr::HumanRepr;
@@ -95,50 +122,51 @@ According to the SI standard, there are 1000 bytes in a `kilobyte`.
 
 Be careful to not render IEC quantities with SI scaling, which would be incorrect. But I still support it, if you really want to ;)
 
-By default, `human-repr` will use SI, `1000` divisor, and `space` between values and scales/units. SI uses prefixes: `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y`.
+By default, `human-repr` will have no features enabled, i.e. it will use SI prefixes, `1000` divisor, and no space between values and scales/units.
 
 This crate supports these optional features:
-- `iec` => use IEC instead of SI: `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, `Ei`, `Zi`, `Yi` (implies `1024`);
-- `1024` => use `1024` divisor — if `iec` is not enabled, use prefixes: `K`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (note the upper 'K');
-- `space` \[default\] => include a space between values and scales/units everywhere: `48 B` instead of `48B`, `15.6 µs` instead of `15.6µs`, and `12.4 kB/s` instead of `12.4kB/s`.
+- `space` => include a space between values and scales/units everywhere: `48 B` instead of `48B`, `15.6 µs` instead of `15.6µs`, and `12.4 kB/s` instead of `12.4kB/s`;
+- `1024` => use `1024` divisor — if `iec` is not enabled, use prefixes: `K`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (note the upper `'K'`);
+- `iec` => use IEC instead of SI: `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, `Ei`, `Zi`, `Yi` (implies `1024`).
 
 ## The human duration magic
 
 I've used just one key concept in designing the human duration features: cleanliness.
-> `3.44 s` is more meaningful than `3.43584783784 s`, and `14.1 µs` is much, much nicer than `.0000141233333 s`.
+> `3.44s` is more meaningful than `3.43584783784s`, and `14.1µs` is much, much nicer than `.0000141233333s`.
 
 So what I do is: round values to at most two decimal places (larger scales have more decimals), and find the best scale to represent them, minimizing resulting values smaller than `1`. The search for the best scale considers even the rounding been applied!
-> `0.000999999` does not end up as `999.9 µs` (truncate) nor `1000 µs` (bad scale), it is auto-upgraded to the next one `1 ms`!
+> `0.000999999` does not end up as `999.9µs` (truncate) nor `1000µs` (bad scale), it is auto-upgraded to the next one `1ms`!
 
 The human duration scale changes seamlessly from nanoseconds to hours!
-  - values smaller than 60 seconds are always rendered as `D.D[D] scale`, with one or two decimals;
+  - values smaller than 60 seconds are rendered as `D[.D]scale`, with up to two decimals;
   - `.0` and `.00` are efficiently not generated instead of removed from the output -> it is handled directly in the format arguments;
-  - from 1 minute onward it changes to "M:SS";
-  - from 1 hour onward it changes to "H:MM:SS".
+  - from 1 minute onward it changes to `M:SS[.m]`;
+  - from 1 hour onward it changes to `H:MM:SS`.
 
 ## The human throughput magic
 
 I've made the human throughput with a similar logic. It is funny how much trickier "throughput" is to the human brain!
 > If something took `1165263` seconds to handle `123` items, how fast did it go? It's not obvious...
 
-It doesn't help much even if we divide the duration by the number of items: `9473` seconds/item still does not seem that good. How fast was that? We can't say for sure.
+It doesn't help much even if we divide the duration by the number of items: 9473 seconds/item still does not seem that good. How fast was that? We can't say for sure.
 <br>Humm, how many items did we do per time?
-> Oh, we just need to invert it, so `0.000105555569858` items/second, there it is! 😂
+> Oh, we just need to invert it, so 0.000105555569858 items/second, there it is! 😂
 
-To make some sense of it we now need to multiply that by 3600 (seconds in an hour) to get `0.38` per hour, which is much better, and again by 24 (hours in a day) to finally get `9.12` per day!! Now we know how fast that process was! \o/
-<br>As you see, it's not easy at all for our brains to estimate that...
+To make some sense of it we now need to multiply that by 3600 (seconds in an hour) to get 0.38 per hour, which is much better, and again by 24 (hours in a day) to finally get 9.12 per day!! Now we know how fast that process was! \o/
+<br>As you see, it's not easy at all for our brains to estimate it...
 
 The human throughput scale changes seamlessly from per second to per day!
   - `.0` and `.00` are efficiently not generated too, much like the duration magic;
-  - it also automatically inserts SI prefixes when in the fastest scale (per second), so we get `2.4 MB/s` or `6.42 Gitems/s` 👍
+  - it also automatically inserts SI prefixes when in the fastest scale (per second), so we get `2.4MB/s` or `6.42Gitems/s` 👍
 
 ## The human count magic
 
-Oh, this is the simplest of them all! I just continually divide by the divisor (1000 or 1024), until the value gets smaller than it. No funny business like logs or exponentials at all.
+This is the simplest of them all, I just continually divide by the current divisor (1000 or 1024), until the value gets smaller than it. No funny business like logs or exponentials at all.
 
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
+- 0.10.0 Jul 17, 2022: new Debug impl with raw and rendered values, new "bare" variations of methods with unit, remove `space` from default features, remove decimal from very small units: ns and counts with no prefix
 - 0.9.x Jun 22, 2022: do not use captured identifiers in format strings, to support much broader Rust versions instead of only >= 1.58
 - 0.8.x Jun 12, 2022: change `nospace` feature to `space`, to avoid the negative logic (it is now default, to maintain behavior)
 - 0.7.x Jun 04, 2022: support for std::time::Duration via a new trait `HumanReprDuration`, include one decimal in the minutes representation
