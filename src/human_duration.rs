@@ -19,7 +19,7 @@ impl fmt::Display for HumanDuration {
                 r if r.abs() >= size => val /= next,
                 r if r.fract() == 0. => return write!(f, "{:.0}{}{}", r, SPACE, scale),
                 r if (r * 10.).fract() == 0. => return write!(f, "{:.1}{}{}", r, SPACE, scale),
-                r => return write!(f, "{:.dec$}{}{}", r, SPACE, scale, dec = dec),
+                r => return write!(f, "{:.2}{}{}", r, SPACE, scale),
             }
         }
 
@@ -27,7 +27,7 @@ impl fmt::Display for HumanDuration {
         let m = val / 60.;
         match m < 60. {
             true => match val % 60. {
-                s if s.fract() == 0. => write!(f, "{}:{:02}", m.trunc(), s.trunc()),
+                s if s.fract() == 0. => write!(f, "{}:{:02}", m.trunc(), s),
                 s => write!(f, "{}:{:04}", m.trunc(), rounded(s, 1)),
             },
             false => write!(

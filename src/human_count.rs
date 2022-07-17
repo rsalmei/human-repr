@@ -27,7 +27,7 @@ impl<T: AsRef<str>> fmt::Display for HumanCount<T> {
                 r if (r * 10.).fract() == 0. => {
                     return write!(f, "{:.1}{}{}{}", r, SPACE, scale, unit)
                 }
-                r => return write!(f, "{:.dec$}{}{}{}", r, SPACE, scale, unit, dec = dec),
+                r => return write!(f, "{:.2}{}{}{}", r, SPACE, scale, unit),
             }
         }
 

@@ -19,7 +19,7 @@ impl<T: AsRef<str>> fmt::Display for HumanThroughput<T> {
                 r if (r * 10.).fract() == 0. => {
                     return write!(f, "{:.1}{}{}{}", r, SPACE, unit, scale)
                 }
-                r => return write!(f, "{:.dec$}{}{}{}", r, SPACE, unit, scale, dec = dec),
+                r => return write!(f, "{:.2}{}{}{}", r, SPACE, unit, scale),
             }
         }
 
