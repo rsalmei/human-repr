@@ -9,7 +9,7 @@ const SPEC: &[&str] = {
         (false, true) => &["", "K", "M", "G", "T", "P", "E", "Z", "Y"], // IEC (without "i" prefixes).
     }
 };
-const DECIMALS: &[usize] = &[1, 1, 1, 2, 2, 2, 2, 2, 2];
+const DECIMALS: &[usize] = &[0, 1, 1, 2, 2, 2, 2, 2, 2];
 const DIVISOR: f64 = {
     match cfg!(feature = "1024") {
         true => 1024.,

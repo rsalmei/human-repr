@@ -3,7 +3,7 @@ use std::time::Duration;
 use std::{fmt, ops};
 
 const SPEC: &[(f64, f64, &str, usize)] = &[
-    (1e3, 1e3, "ns", 1),
+    (1e3, 1e3, "ns", 0),
     (1e3, 1e3, "µs", 1), // uses non-ASCII “µs” suffix.
     (1e3, 1e3, "ms", 1),
     (60., 1., "s", 2),

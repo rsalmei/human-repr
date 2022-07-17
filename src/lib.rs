@@ -135,9 +135,9 @@ const SPACE: &str = {
 #[inline]
 fn rounded(val: f64, dec: usize) -> f64 {
     match dec {
+        0 => val.round(),
         1 => (val * 10.).round() / 10.,
         2 => (val * 100.).round() / 100.,
-        // 0 => val.round(),
         _ => unreachable!(),
     }
 }
