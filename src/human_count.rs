@@ -4,9 +4,9 @@ use std::{fmt, ops};
 // Not enabling any optional features gets: SI symbols, divisor is 1000, and with space.
 const SPEC: &[&str] = {
     match (cfg!(feature = "iec"), cfg!(feature = "1024")) {
+        (false, false) => &["", "k", "M", "G", "T", "P", "E", "Z", "Y"], // SI (1000).
+        (false, true) => &["", "K", "M", "G", "T", "P", "E", "Z", "Y"],  // SI (1024).
         (true, _) => &["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"], // IEC (1024)
-        (false, false) => &["", "k", "M", "G", "T", "P", "E", "Z", "Y"],    // SI (1000).
-        (false, true) => &["", "K", "M", "G", "T", "P", "E", "Z", "Y"], // IEC (without "i" prefixes).
     }
 };
 const DECIMALS: &[usize] = &[0, 1, 1, 2, 2, 2, 2, 2, 2];
