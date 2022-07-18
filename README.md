@@ -16,7 +16,7 @@ use human_repr::HumanRepr;
 assert_eq!("43.21GB", 43214321123_u64.human_count_bytes());
 assert_eq!("123.5kPackets", 123456_u32.human_count("Packets"));
 assert_eq!("74.9M", 74893200.human_count_bare());
-assert_eq!("48°C", 48.human_count("°C"));
+assert_eq!("48.1°C", 48.132323432.human_count("°C"));
 
 // primitive durations
 assert_eq!("15.6µs", 0.0000156.human_duration());

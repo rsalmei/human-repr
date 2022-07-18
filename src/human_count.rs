@@ -9,7 +9,7 @@ const SPEC: &[&str] = {
         (true, _) => &["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"], // IEC (1024)
     }
 };
-const DECIMALS: &[usize] = &[0, 1, 1, 2, 2, 2, 2, 2, 2];
+const DECIMALS: &[usize] = &[1, 1, 1, 2, 2, 2, 2, 2, 2];
 const DIVISOR: f64 = {
     match cfg!(feature = "1024") {
         true => 1024.,
@@ -78,7 +78,7 @@ mod tests {
         assert_eq!("123.5kB", 123456_u64.human_count_bytes());
         assert_eq!("23B", 23u8.human_count_bytes());
         assert_eq!("23B", 23i8.human_count_bytes());
-        assert_eq!("24B", 23.5.human_count_bytes());
+        assert_eq!("23.5B", 23.5123.human_count_bytes());
         assert_eq!("-23B", -23i8.human_count_bytes());
         assert_eq!("1kB", 1025u16.human_count_bytes());
         assert_eq!("-1kB", -1025i16.human_count_bytes());
@@ -96,6 +96,8 @@ mod tests {
         assert_eq!("123MCrabs", 123e6.human_count("Crabs"));
         assert_eq!("123MCrabs", 123e6.human_count("Crabs".to_owned()));
         assert_eq!("123k🦀", 123e3.human_count("🦀"));
+        assert_eq!("12.3k°C", 123e2.human_count("°C"));
+        assert_eq!("1.2°C", 123e-2.human_count("°C"));
     }
 
     #[test]

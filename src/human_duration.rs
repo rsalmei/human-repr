@@ -3,7 +3,7 @@ use std::time::Duration;
 use std::{fmt, ops};
 
 const SPEC: &[(f64, f64, &str, usize)] = &[
-    (1e3, 1e3, "ns", 0),
+    (1e3, 1e3, "ns", 1),
     (1e3, 1e3, "µs", 1), // uses non-ASCII “µs” suffix.
     (1e3, 1e3, "ms", 1),
     (60., 1., "s", 2),
@@ -88,8 +88,8 @@ mod tests {
     fn operation() {
         assert_eq!("1s", 1.human_duration());
         assert_eq!("-1s", -1.human_duration());
-        assert_eq!("1ns", 0.00000000123.human_duration());
-        assert_eq!("2ns", 0.0000000018.human_duration());
+        assert_eq!("1.2ns", 0.00000000123.human_duration());
+        assert_eq!("1.8ns", 0.0000000018.human_duration());
         assert_eq!("1µs", 0.000001.human_duration());
         assert_eq!("-1µs", -0.000001.human_duration());
         assert_eq!("1µs", 0.000000999996.human_duration());

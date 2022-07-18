@@ -73,7 +73,7 @@ mod tests {
         assert_eq!("30B/m", (1. / 2.).human_throughput_bytes());
         assert_eq!("-30B/m", (-1. / 2.).human_throughput_bytes());
         assert_eq!("5B/s", (10. / 2.).human_throughput_bytes());
-        assert_eq!("6B/s", (11. / 2.).human_throughput_bytes());
+        assert_eq!("5.5B/s", (11. / 2.).human_throughput_bytes());
         assert_eq!("6.1B/m", (10. / 99.).human_throughput_bytes());
         assert_eq!("1.8B/m", (3. / 100.).human_throughput_bytes());
         assert_eq!("4.4B/m", (8. / 110.).human_throughput_bytes());
@@ -101,6 +101,8 @@ mod tests {
         assert_eq!("123MCrabs/s", 123e6.human_throughput("Crabs"));
         assert_eq!("123MCrabs/s", 123e6.human_throughput("Crabs".to_owned()));
         assert_eq!("123M🦀/s", 123e6.human_throughput("🦀"));
+        assert_eq!("12.3k°C/s", 123e2.human_throughput("°C"));
+        assert_eq!("1.2°C/s", 123e-2.human_throughput("°C"));
     }
 
     #[test]
