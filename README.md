@@ -82,7 +82,7 @@ They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`,
 > ```
 
 The `unit` parameter some methods make available means the entity you're dealing with, like "bytes", "actions", "iterations", "errors", whatever! You can send either the whole unit name, or a shortened one like "B", "it", etc, or even an empty str!
-<br>Bytes have dedicated methods for convenience.
+<br>Bytes and bare unit have dedicated methods for convenience.
 
 ## How to use it
 
@@ -166,7 +166,7 @@ This is the simplest of them all, I just continually divide by the current divis
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
-- 0.10.0 Jul 17, 2022: new Debug impl with raw and rendered values, new "bare" variations of methods with unit, remove `space` from default features, remove decimal from very small units: ns and counts with no prefix
+- 0.10.x Jul 17, 2022: new Debug impl with raw and rendered values, new "bare unit" method variations, remove `space` from default features
 - 0.9.x Jun 22, 2022: do not use captured identifiers in format strings, to support much broader Rust versions instead of only >= 1.58
 - 0.8.x Jun 12, 2022: change `nospace` feature to `space`, to avoid the negative logic (it is now default, to maintain behavior)
 - 0.7.x Jun 04, 2022: support for std::time::Duration via a new trait `HumanReprDuration`, include one decimal in the minutes representation
