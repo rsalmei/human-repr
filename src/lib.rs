@@ -43,8 +43,8 @@ pub trait HumanRepr: sealed::Sealed + Sized {
         self.human_count(BYTES)
     }
 
-    /// Generate a beautiful human-readable duration, supporting SI prefixes nanos (`ns`), millis (`ms`),
-    /// micros (`µs`), and seconds (`s`), in addition to minutes (`M:SS`) and even hours (`H:MM:SS`).
+    /// Generate a beautiful human-readable duration, supporting SI prefixes nanos (`ns`), micros (`µs`),
+    /// millis (`ms`), and seconds (`s`), in addition to minutes (`M:SS`) and even hours (`H:MM:SS`).
     ///
     /// ```
     /// use human_repr::HumanRepr;
@@ -85,8 +85,8 @@ pub trait HumanRepr: sealed::Sealed + Sized {
 }
 
 pub trait HumanReprDuration: sealed::Sealed + Sized {
-    /// Generate a beautiful human-readable duration, supporting SI prefixes nanos (`ns`), millis (`ms`),
-    /// micros (`µs`), and seconds (`s`), in addition to minutes (`M:SS`) and even hours (`H:MM:SS`).
+    /// Generate a beautiful human-readable duration, supporting SI prefixes nanos (`ns`), micros (`µs`),
+    /// millis (`ms`), and seconds (`s`), in addition to minutes (`M:SS`) and even hours (`H:MM:SS`).
     ///
     /// ```
     /// use human_repr::HumanReprDuration;

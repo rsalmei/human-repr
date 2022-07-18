@@ -47,7 +47,7 @@ assert_eq!("1:14:48", Duration::new(4488, 395_000_000).human_duration());
 
 This crate implements a whole suite of:
 - counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (with optional IEC prefixes and "mixed" ones, see Rust features);
-- durations, supporting SI prefixes nanos (`ns`), millis (`ms`), micros (`µs`), seconds (`s`), minutes (`M:SS`), and even hours (`H:MM:SS`);
+- durations, supporting SI prefixes nanos (`ns`), micros (`µs`), millis (`ms`), and seconds (`s`), in addition to minutes (`M:SS`) and even hours (`H:MM:SS`);
 - throughputs, supporting per day (`/d`), per hour (`/h`), per minute (`/m`), and per second (`/s`).
 
 This crate doesn't have any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns (checked with criterion benchmarks) to generate a representation!
