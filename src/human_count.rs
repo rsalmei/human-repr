@@ -50,13 +50,13 @@ impl<T: AsRef<str>> fmt::Debug for HumanCount<T> {
 
 impl<T: AsRef<str>> PartialEq<HumanCount<T>> for &str {
     fn eq(&self, other: &HumanCount<T>) -> bool {
-        *self == &other.to_string()
+        super::display_compare(self, other)
     }
 }
 
 impl<T: AsRef<str>> PartialEq<&str> for HumanCount<T> {
     fn eq(&self, other: &&str) -> bool {
-        &self.to_string() == other
+        other == self
     }
 }
 

@@ -53,13 +53,13 @@ impl fmt::Debug for HumanDuration {
 
 impl PartialEq<HumanDuration> for &str {
     fn eq(&self, other: &HumanDuration) -> bool {
-        *self == &other.to_string()
+        super::display_compare(*self, other)
     }
 }
 
 impl PartialEq<&str> for HumanDuration {
     fn eq(&self, other: &&str) -> bool {
-        other == &self.to_string()
+        other == self
     }
 }
 

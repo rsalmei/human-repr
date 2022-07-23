@@ -42,13 +42,13 @@ impl<T: AsRef<str>> fmt::Debug for HumanThroughput<T> {
 
 impl<T: AsRef<str>> PartialEq<HumanThroughput<T>> for &str {
     fn eq(&self, other: &HumanThroughput<T>) -> bool {
-        *self == &other.to_string()
+        super::display_compare(*self, other)
     }
 }
 
 impl<T: AsRef<str>> PartialEq<&str> for HumanThroughput<T> {
     fn eq(&self, other: &&str) -> bool {
-        &self.to_string() == other
+        other == self
     }
 }
 
