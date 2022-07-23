@@ -112,4 +112,9 @@ mod tests {
         assert_eq!("42kB/s", (&a).human_throughput_bytes());
         assert_eq!("42kB/s", (&mut a).human_throughput_bytes());
     }
+
+    #[test]
+    fn symmetric() {
+        assert_eq!(1.human_throughput_bytes(), "1B/s");
+    }
 }

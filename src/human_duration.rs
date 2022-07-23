@@ -161,4 +161,9 @@ mod tests {
         assert_eq!("10ms", (&a).human_duration());
         assert_eq!("10ms", (&mut a).human_duration());
     }
+
+    #[test]
+    fn symmetric() {
+        assert_eq!(1.human_duration(), "1s");
+    }
 }

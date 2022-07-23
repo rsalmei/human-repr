@@ -107,4 +107,9 @@ mod tests {
         assert_eq!("42kB", (&a).human_count_bytes());
         assert_eq!("42kB", (&mut a).human_count_bytes());
     }
+
+    #[test]
+    fn symmetric() {
+        assert_eq!(123000_u64.human_count_bytes(), "123kB");
+    }
 }
