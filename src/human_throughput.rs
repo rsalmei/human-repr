@@ -36,7 +36,7 @@ impl<T: AsRef<str>> fmt::Debug for HumanThroughput<T> {
         }
         ds.finish()?;
         write!(f, " -> ")?;
-        <Self as fmt::Display>::fmt(self, f)
+        fmt::Display::fmt(self, f)
     }
 }
 

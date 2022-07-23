@@ -44,7 +44,7 @@ impl<T: AsRef<str>> fmt::Debug for HumanCount<T> {
         }
         ds.finish()?;
         write!(f, " -> ")?;
-        <Self as fmt::Display>::fmt(self, f)
+        fmt::Display::fmt(self, f)
     }
 }
 

@@ -47,7 +47,7 @@ impl fmt::Debug for HumanDuration {
             .field("val", &self.0)
             .finish()?;
         write!(f, " -> ")?;
-        <Self as fmt::Display>::fmt(self, f)
+        fmt::Display::fmt(self, f)
     }
 }
 
