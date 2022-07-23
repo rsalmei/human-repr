@@ -24,18 +24,18 @@ impl fmt::Display for HumanDuration {
         }
 
         val = rounded(val, 1);
-        let m = val / 60.;
+        let (m, s) = (val / 60., val % 60.);
         match m < 60. {
-            true => match val % 60. {
-                s if s.fract() == 0. => write!(f, "{}:{:02}", m.trunc(), s),
-                s => write!(f, "{}:{:04}", m.trunc(), rounded(s, 1)),
+            true => match s {
+                _ if s.fract() == 0. => write!(f, "{}:{:02}", m.trunc(), s),
+                _ => write!(f, "{}:{:04}", m.trunc(), rounded(s, 1)),
             },
             false => write!(
                 f,
                 "{}:{:02}:{:02}",
                 (m / 60.).trunc(),
                 (m % 60.).trunc(),
-                (val % 60.).trunc()
+                s.trunc()
             ),
         }
     }
