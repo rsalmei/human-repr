@@ -4,10 +4,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Crates.io](https://img.shields.io/crates/v/human_repr.svg)](https://crates.io/crates/human-repr)
 [![Docs](https://docs.rs/human-repr/badge.svg)](https://docs.rs/human-repr)
+[![dependency status](https://deps.rs/repo/github/rsalmei/human-repr/status.svg)](https://deps.rs/repo/github/rsalmei/human-repr)
 
-## What it does
-
-Easily generate several kinds of human-readable descriptions, directly on primitive numbers:
+Easily generate several kinds of human-readable descriptions, directly on primitive numbers and [`Duration`](`std::time::Duration`)s!
 
 ```rust
 use human_repr::HumanRepr;
@@ -32,13 +31,9 @@ assert_eq!("9/d", (125. / 1200000.).human_throughput_bare());
 assert_eq!("54°C/h", (24. / 1600.).human_throughput("°C"));
 // the divisions above are just for the sake of clarity: they show 
 // the very concept of a "throughput": number of items per time.
-```
 
-And even on [`Duration`](`std::time::Duration`) instances:
-
-```rust
 use human_repr::HumanReprDuration;
-use std::time::Duration;
+# use std::time::Duration;
 
 assert_eq!("15.6µs", Duration::new(0, 15_600).human_duration());
 assert_eq!("10ms", Duration::from_secs_f64(0.01).human_duration());
@@ -46,43 +41,47 @@ assert_eq!("1:14:48", Duration::new(4488, 395_000_000).human_duration());
 ```
 
 This crate implements a whole suite of:
-- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (with optional IEC prefixes and "mixed" ones, see Rust features);
-- durations, supporting SI prefixes nanos (`ns`), micros (`µs`), millis (`ms`), and seconds (`s`), in addition to minutes (`M:SS`) and even hours (`H:MM:SS`);
-- throughputs, supporting per day (`/d`), per hour (`/h`), per minute (`/m`), and per second (`/s`).
+- counts, supporting SI prefixes `k`, `M`, `G`, `T`, `P`, `E`, `Z`, and `Y` (including optional IEC prefixes and "mixed" ones, see Rust features);
+- durations, supporting SI prefixes nanos (`ns`), micros (`µs`), millis (`ms`), and seconds (`s`), in addition to custom minutes:seconds (`M:SS.m`) and even hours:minutes:seconds (`H:MM:SS`);
+- throughputs, supporting per day (`/d`), per hour (`/h`), per minute (`/m`), and per second (`/s`) -> per second even gets SI prefixes too.
 
-This crate doesn't have any dependencies, is well-tested, and is blazingly fast, taking only ~50 ns (checked with criterion benchmarks) to generate a representation!
-<br>Since version 0.4, I do not allocate any Strings! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
-<br>Since version 0.10, the [`Debug`](`std::fmt::Debug`) impl will show both the raw value and the final representation! Very, very cool.
-```rust
-use human_repr::HumanRepr;
+This crate doesn't have any dependencies, is well-tested, and is blazing fast, taking only ~50 ns to generate a representation! Checked with criterion benchmarks.
 
-assert_eq!("HumanDuration { val: 1.56e-5 } -> 15.6µs", format!("{:?}", 0.0000156.human_duration()));
-assert_eq!(r#"HumanThroughput { val: 0.015, unit: "°C" } -> 54°C/h"#, format!("{:?}", 0.015.human_throughput("°C")));
-```
+> Since version 0.11, the [`PartialEq`](`std::cmp::PartialEq`) impls for `&str` do not allocate any Strings too!
+> <br>I've developed a particularly interesting [`Write`](`std::fmt::Write`) impl, which compares partial sequences with what the [`Display`](`std::fmt::Display`) impl would be generating!
+
+> Since version 0.10, the [`Debug`](`std::fmt::Debug`) impl will show both the raw value and the final representation! Very, very cool:
+> ```rust
+> # use human_repr::HumanRepr;
+> assert_eq!("HumanDuration { val: 1.56e-5 } -> 15.6µs", format!("{:?}", 0.0000156.human_duration()));
+> assert_eq!(r#"HumanThroughput { val: 0.015, unit: "°C" } -> 54°C/h"#, format!("{:?}", 0.015.human_throughput("°C")));
+> ```
+
+> Since version 0.4, I do not allocate any Strings to generate the output! I've returned structs that implement [`Display`](`std::fmt::Display`), so you can print them with no heap allocations at all! And if you do need the String, a simple `.to_string()` will do.
 
 They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
 `f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`, as well as [`Duration`](`std::time::Duration`) types.
 
-> Yes yes, I know `Duration`s do have a [`Debug`](`std::fmt::Debug`) impl that does something like this, but it is not very _human_:
+> Yes, I know `Duration`s do have a [`Debug`](`std::fmt::Debug`) impl that does something like this, but it is not very _human_:
 > ```rust
-> use human_repr::HumanReprDuration;
-> use std::time::Duration;
-> 
-> assert_eq!("14.184293ms", format!("{:?}", Duration::new(0, 14184293))); // yikes!
+> # use human_repr::HumanReprDuration;
+> # use std::time::Duration;
+> let default = format!("{:?}", Duration::new(0, 14184293));
+> assert_eq!("14.184293ms", default); // 😫👎
 > assert_eq!("14.2ms", Duration::new(0, 14184293).human_duration()); // 😃👍
 > ```
 > 
-> And of course, there are minutes and hours views...
+> And of course, I have the minutes and hours views...
 > ```rust
-> use human_repr::HumanReprDuration;
-> use std::time::Duration;
-> 
-> assert_eq!("10000.000000001s", format!("{:?}", Duration::new(10000, 1))); // horrendous!
+> # use human_repr::HumanReprDuration;
+> # use std::time::Duration;
+> let default = format!("{:?}", Duration::new(10000, 1));
+> assert_eq!("10000.000000001s", default); // 😫👎
 > assert_eq!("2:46:40", Duration::new(10000, 1).human_duration()); // 😃👍
 > ```
 
 The `unit` parameter some methods make available means the entity you're dealing with, like "bytes", "actions", "iterations", "errors", whatever! You can send either the whole unit name, or a shortened one like "B", "it", etc, or even an empty str!
-<br>Bytes and bare unit have dedicated methods for convenience.
+<br>Bytes and bare units have dedicated methods for convenience.
 
 ## How to use it
 
@@ -92,7 +91,8 @@ Add this dependency to your Cargo.toml file:
 human-repr = "0"
 ```
 
-Then just use the main trait! You can now call on any number:
+Then just `use` the main trait!
+<br>You can now call on any number:
 
 ```rust
 use human_repr::HumanRepr;
@@ -111,8 +111,8 @@ For durations, use the specific trait:
 
 ```rust
 use human_repr::HumanReprDuration;
-
-std::time::Duration::from_secs_f64(0.00432).human_duration();
+# use std::time::Duration;
+Duration::from_secs_f64(0.00432).human_duration();
 ```
 
 ## Rust features:
@@ -166,13 +166,14 @@ This is the simplest of them all, I just continually divide by the current divis
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
+- 0.11.x Jul 22, 2022: new PartialEq impls for `&str`, which is even faster and does not allocate any Strings
 - 0.10.x Jul 17, 2022: new Debug impl with raw and rendered values, new "bare unit" method variations, remove `space` from default features
 - 0.9.x Jun 22, 2022: do not use captured identifiers in format strings, to support much broader Rust versions instead of only >= 1.58
 - 0.8.x Jun 12, 2022: change `nospace` feature to `space`, to avoid the negative logic (it is now default, to maintain behavior)
 - 0.7.x Jun 04, 2022: support for std::time::Duration via a new trait `HumanReprDuration`, include one decimal in the minutes representation
 - 0.6.x Jun 04, 2022: improve signed support with new `ops::Neg` impl
 - 0.5.x Jun 03, 2022: new minutes representation M:SS, between seconds and complete H:MM:SS
-- 0.4.x Jun 03, 2022: even faster implementation, which does not do any String allocations
+- 0.4.x Jun 03, 2022: new render engine via Display, which is even faster and does not allocate any Strings
 - 0.3.x Jun 01, 2022: support for a new group of prefixes for `1024` only (without `iec`)
 - 0.2.x Jun 01, 2022: more flexible API (`impl AsRef<str>`), greatly improved documentation
 - 0.1.x Jun 01, 2022: first release, include readme, method and module docs, describe features already implemented
