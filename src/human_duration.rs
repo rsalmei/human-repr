@@ -1,4 +1,4 @@
-use super::{rounded, HumanDuration, HumanRepr, HumanReprDuration, SPACE};
+use super::{rounded, HumanDurationData, SPACE};
 use std::time::Duration;
 use std::{fmt, ops};
 
@@ -11,7 +11,7 @@ const SPEC: &[(f64, f64, &str, usize)] = &[
     // 1:01:01 (hours in code, 0 decimal).
 ];
 
-impl fmt::Display for HumanDuration {
+impl fmt::Display for HumanDurationData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut val = self.0 * 1e9;
         for &(size, next, scale, dec) in SPEC {
@@ -41,7 +41,7 @@ impl fmt::Display for HumanDuration {
     }
 }
 
-impl fmt::Debug for HumanDuration {
+impl fmt::Debug for HumanDurationData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HumanDuration")
             .field("val", &self.0)
@@ -51,38 +51,36 @@ impl fmt::Debug for HumanDuration {
     }
 }
 
-impl PartialEq<HumanDuration> for &str {
-    fn eq(&self, other: &HumanDuration) -> bool {
+impl PartialEq<HumanDurationData> for &str {
+    fn eq(&self, other: &HumanDurationData) -> bool {
         super::display_compare(*self, other)
     }
 }
 
-impl PartialEq<&str> for HumanDuration {
+impl PartialEq<&str> for HumanDurationData {
     fn eq(&self, other: &&str) -> bool {
         other == self
     }
 }
 
-impl ops::Neg for HumanDuration {
-    type Output = HumanDuration;
+impl ops::Neg for HumanDurationData {
+    type Output = HumanDurationData;
 
     fn neg(self) -> Self::Output {
-        HumanDuration(-self.0)
+        HumanDurationData(-self.0)
     }
 }
 
-impl super::sealed::Sealed for Duration {}
-
-impl HumanReprDuration for Duration {
-    fn human_duration(self) -> HumanDuration {
-        self.as_secs_f64().human_duration()
+impl From<Duration> for HumanDurationData {
+    fn from(d: Duration) -> Self {
+        use crate::HumanDuration;
+        d.as_secs_f64().human_duration()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{HumanRepr, HumanReprDuration};
-    use std::time::Duration;
+    use crate::HumanDuration;
 
     #[test]
     fn operation() {
@@ -119,6 +117,8 @@ mod tests {
 
     #[test]
     fn flexibility() {
+        use crate::HumanDuration;
+        use std::time::Duration;
         macro_rules! d {
             {$f:literal} => {
                 Duration::from_secs_f64($f)

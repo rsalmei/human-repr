@@ -1,4 +1,4 @@
-use super::{rounded, HumanRepr, HumanThroughput, SPACE};
+use super::{rounded, HumanThroughputData, SPACE};
 use std::{fmt, ops};
 
 const SPEC: &[(f64, &str, usize)] = &[
@@ -8,7 +8,7 @@ const SPEC: &[(f64, &str, usize)] = &[
     // "/s" in code.
 ];
 
-impl<T: AsRef<str>> fmt::Display for HumanThroughput<T> {
+impl<T: AsRef<str>> fmt::Display for HumanThroughputData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let (mut val, unit) = (self.0, self.1.as_ref());
         val *= 60. * 60. * 24.;
@@ -23,11 +23,12 @@ impl<T: AsRef<str>> fmt::Display for HumanThroughput<T> {
             }
         }
 
+        use super::HumanCount;
         write!(f, "{}/s", val.human_count(unit))
     }
 }
 
-impl<T: AsRef<str>> fmt::Debug for HumanThroughput<T> {
+impl<T: AsRef<str>> fmt::Debug for HumanThroughputData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut ds = f.debug_struct("HumanThroughput");
         ds.field("val", &self.0);
@@ -40,29 +41,29 @@ impl<T: AsRef<str>> fmt::Debug for HumanThroughput<T> {
     }
 }
 
-impl<T: AsRef<str>> PartialEq<HumanThroughput<T>> for &str {
-    fn eq(&self, other: &HumanThroughput<T>) -> bool {
+impl<T: AsRef<str>> PartialEq<HumanThroughputData<T>> for &str {
+    fn eq(&self, other: &HumanThroughputData<T>) -> bool {
         super::display_compare(*self, other)
     }
 }
 
-impl<T: AsRef<str>> PartialEq<&str> for HumanThroughput<T> {
+impl<T: AsRef<str>> PartialEq<&str> for HumanThroughputData<T> {
     fn eq(&self, other: &&str) -> bool {
         other == self
     }
 }
 
-impl<T> ops::Neg for HumanThroughput<T> {
-    type Output = HumanThroughput<T>;
+impl<T> ops::Neg for HumanThroughputData<T> {
+    type Output = HumanThroughputData<T>;
 
     fn neg(self) -> Self::Output {
-        HumanThroughput(-self.0, self.1)
+        HumanThroughputData(-self.0, self.1)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::HumanRepr;
+    use crate::HumanThroughput;
 
     #[test]
     fn operation() {

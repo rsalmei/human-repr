@@ -1,4 +1,4 @@
-use super::{rounded, HumanCount, SPACE};
+use super::{rounded, HumanCountData, SPACE};
 use std::{fmt, ops};
 
 // Not enabling any optional features gets: SI symbols, divisor is 1000, and with space.
@@ -17,7 +17,7 @@ const DIVISOR: f64 = {
     }
 };
 
-impl<T: AsRef<str>> fmt::Display for HumanCount<T> {
+impl<T: AsRef<str>> fmt::Display for HumanCountData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let (mut val, unit) = (self.0, self.1.as_ref());
         for (&scale, &dec) in SPEC.iter().zip(DECIMALS) {
@@ -35,7 +35,7 @@ impl<T: AsRef<str>> fmt::Display for HumanCount<T> {
     }
 }
 
-impl<T: AsRef<str>> fmt::Debug for HumanCount<T> {
+impl<T: AsRef<str>> fmt::Debug for HumanCountData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut ds = f.debug_struct("HumanCount");
         ds.field("val", &self.0);
@@ -48,29 +48,29 @@ impl<T: AsRef<str>> fmt::Debug for HumanCount<T> {
     }
 }
 
-impl<T: AsRef<str>> PartialEq<HumanCount<T>> for &str {
-    fn eq(&self, other: &HumanCount<T>) -> bool {
+impl<T: AsRef<str>> PartialEq<HumanCountData<T>> for &str {
+    fn eq(&self, other: &HumanCountData<T>) -> bool {
         super::display_compare(self, other)
     }
 }
 
-impl<T: AsRef<str>> PartialEq<&str> for HumanCount<T> {
+impl<T: AsRef<str>> PartialEq<&str> for HumanCountData<T> {
     fn eq(&self, other: &&str) -> bool {
         other == self
     }
 }
 
-impl<T> ops::Neg for HumanCount<T> {
-    type Output = HumanCount<T>;
+impl<T> ops::Neg for HumanCountData<T> {
+    type Output = HumanCountData<T>;
 
     fn neg(self) -> Self::Output {
-        HumanCount(-self.0, self.1)
+        HumanCountData(-self.0, self.1)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::HumanRepr;
+    use crate::HumanCount;
 
     #[test]
     fn operation() {
