@@ -1,21 +1,22 @@
 # human-repr
-### Generate beautiful human representations of bytes, durations and even throughputs!
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Crates.io](https://img.shields.io/crates/v/human_repr.svg)](https://crates.io/crates/human-repr)
 [![Docs](https://docs.rs/human-repr/badge.svg)](https://docs.rs/human-repr)
 [![dependency status](https://deps.rs/repo/github/rsalmei/human-repr/status.svg)](https://deps.rs/repo/github/rsalmei/human-repr)
 
-Easily generate several kinds of human-readable descriptions, directly on primitive numbers and [`Duration`](`std::time::Duration`)s!
+Generate beautiful human-readable representations of bytes, durations and even throughputs! Easily call them directly on primitive numbers and [`Duration`](`std::time::Duration`)s!
 
 ```rust
-use human_repr::HumanRepr;
+use human_repr::HumanCount;
 
 // counts (bare, bytes, or any custom unit)
 assert_eq!("43.21GB", 43214321123_u64.human_count_bytes());
 assert_eq!("123.5kPackets", 123456_u32.human_count("Packets"));
 assert_eq!("74.9M", 74893200.human_count_bare());
 assert_eq!("48.1°C", 48.132323432.human_count("°C"));
+
+use human_repr::HumanDuration;
 
 // primitive durations
 assert_eq!("15.6µs", 0.0000156.human_duration());
@@ -24,20 +25,20 @@ assert_eq!("3.44s", 3.435999.human_duration());
 assert_eq!("19:20.4", 1160.36.human_duration());
 assert_eq!("1:14:48", 4488.395.human_duration());
 
+use std::time::Duration;
+assert_eq!("15.6µs", Duration::new(0, 15_600).human_duration());
+assert_eq!("10ms", Duration::from_secs_f64(0.01).human_duration());
+assert_eq!("1:14:48", Duration::new(4488, 395_000_000).human_duration());
+
+use human_repr::HumanThroughput;
+
 // throughputs (bare, bytes, or any custom unit)
 assert_eq!("1.2MB/s", (1234567. / 1.).human_throughput_bytes());
 assert_eq!("6.1tests/m", (8. / 79.).human_throughput("tests"));
 assert_eq!("9/d", (125. / 1200000.).human_throughput_bare());
 assert_eq!("54°C/h", (24. / 1600.).human_throughput("°C"));
 // the divisions above are just for the sake of clarity: they show 
-// the very concept of a "throughput": number of items per time.
-
-use human_repr::HumanReprDuration;
-# use std::time::Duration;
-
-assert_eq!("15.6µs", Duration::new(0, 15_600).human_duration());
-assert_eq!("10ms", Duration::from_secs_f64(0.01).human_duration());
-assert_eq!("1:14:48", Duration::new(4488, 395_000_000).human_duration());
+// the very concept of a "throughput": number of items per elapsed time.
 ```
 
 This crate implements a whole suite of:
@@ -47,12 +48,15 @@ This crate implements a whole suite of:
 
 This crate doesn't have any dependencies, is well-tested, and is blazing fast, taking only ~50 ns to generate a representation! Checked with criterion benchmarks.
 
+This crate gets to 1.0! 🎉 Lots of improvements since the beginning...
+> Since 1.0, the `HumanRepr` was removed, now there are separate traits for each concept. I've realized that separate traits were better than a common one, so each can get their own impls and evolve freely. The trait names are also simpler: HumanCount, HumanDuration, and HumanThroughput.
+
 > Since version 0.11, the [`PartialEq`](`std::cmp::PartialEq`) impls for `&str` do not allocate any Strings too!
 > <br>I've developed a particularly interesting [`Write`](`std::fmt::Write`) impl, which compares partial sequences with what the [`Display`](`std::fmt::Display`) impl would be generating!
 
 > Since version 0.10, the [`Debug`](`std::fmt::Debug`) impl will show both the raw value and the final representation! Very, very cool:
 > ```rust
-> # use human_repr::HumanRepr;
+> # use human_repr::{HumanDuration, HumanThroughput};
 > assert_eq!("HumanDuration { val: 1.56e-5 } -> 15.6µs", format!("{:?}", 0.0000156.human_duration()));
 > assert_eq!(r#"HumanThroughput { val: 0.015, unit: "°C" } -> 54°C/h"#, format!("{:?}", 0.015.human_throughput("°C")));
 > ```
@@ -62,9 +66,9 @@ This crate doesn't have any dependencies, is well-tested, and is blazing fast, t
 They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
 `f64`, `i8`, `i16`, `i32`, `i64`, `i128`, `isize`, as well as [`Duration`](`std::time::Duration`) types.
 
-> Yes, I know `Duration`s do have a [`Debug`](`std::fmt::Debug`) impl that does something like this, but it is not very _human_:
+> Note `Duration`s do have a [`Debug`](`std::fmt::Debug`) impl that does something similar, but it is not very _human_:
 > ```rust
-> # use human_repr::HumanReprDuration;
+> # use human_repr::HumanDuration;
 > # use std::time::Duration;
 > let default = format!("{:?}", Duration::new(0, 14184293));
 > assert_eq!("14.184293ms", default); // 😫👎
@@ -73,7 +77,7 @@ They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`,
 > 
 > And of course, I have the minutes and hours views...
 > ```rust
-> # use human_repr::HumanReprDuration;
+> # use human_repr::HumanDuration;
 > # use std::time::Duration;
 > let default = format!("{:?}", Duration::new(10000, 1));
 > assert_eq!("10000.000000001s", default); // 😫👎
@@ -88,31 +92,24 @@ The `unit` parameter some methods make available means the entity you're dealing
 Add this dependency to your Cargo.toml file:
 
 ```toml
-human-repr = "0"
+human-repr = "1"
 ```
 
-Then just `use` the main trait!
-<br>You can now call on any number:
+Then just `use` the needed traits!
 
 ```rust
-use human_repr::HumanRepr;
+use human_repr::{HumanCount, HumanDuration, HumanThroughput};
 
 3000_u16.human_count("bytes");
 -5i8.human_count_bytes();
 
 4244.32_f32.human_duration();
 0.000000000004432_f64.human_duration();
+# use std::time::Duration;
+Duration::from_secs_f64(0.00432).human_duration();
 
 8987_isize.human_throughput("transactions");
 93321_usize.human_throughput_bytes();
-```
-
-For durations, use the specific trait:
-
-```rust
-use human_repr::HumanReprDuration;
-# use std::time::Duration;
-Duration::from_secs_f64(0.00432).human_duration();
 ```
 
 ## Rust features:
