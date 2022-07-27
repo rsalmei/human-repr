@@ -2,15 +2,21 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use human_repr::HumanThroughput;
 use std::fmt::Write;
 
-fn benchmark<T: HumanThroughput>(val: T, buf: &mut String) {
-    let _ = write!(buf, "{}", black_box(val).human_throughput_bytes());
-    buf.clear();
+pub struct Null;
+
+impl Write for Null {
+    fn write_str(&mut self, _s: &str) -> std::fmt::Result {
+        Ok(())
+    }
+}
+
+fn benchmark<T: HumanThroughput>(val: T) {
+    let _ = write!(Null, "{}", black_box(val).human_throughput_bytes());
 }
 
 pub fn small(c: &mut Criterion) {
-    let mut buf = String::with_capacity(64);
     c.bench_function("human-throughput", |b| {
-        b.iter(|| benchmark(1. / (60. * 60. * 24.), &mut buf))
+        b.iter(|| benchmark(1. / (60. * 60. * 24.)))
     });
 }
 

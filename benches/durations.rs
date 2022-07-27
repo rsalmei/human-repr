@@ -2,16 +2,20 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use human_repr::HumanDuration;
 use std::fmt::Write;
 
-fn benchmark<T: HumanDuration>(val: T, buf: &mut String) {
-    let _ = write!(buf, "{}", black_box(val).human_duration());
-    buf.clear();
+pub struct Null;
+
+impl Write for Null {
+    fn write_str(&mut self, _s: &str) -> std::fmt::Result {
+        Ok(())
+    }
+}
+
+fn benchmark<T: HumanDuration>(val: T) {
+    let _ = write!(Null, "{}", black_box(val).human_duration());
 }
 
 pub fn small(c: &mut Criterion) {
-    let mut buf = String::with_capacity(64);
-    c.bench_function("human-duration", |b| {
-        b.iter(|| benchmark(0.000000001_f64, &mut buf))
-    });
+    c.bench_function("human-duration", |b| b.iter(|| benchmark(0.000000001_f64)));
 }
 
 criterion_group!(benches, small);
