@@ -1,7 +1,7 @@
 use super::{rounded, HumanCountData, SPACE};
 use std::{fmt, ops};
 
-// Not enabling any optional features gets: SI symbols, divisor is 1000, and with space.
+// with default features we get: SI symbols, 1000 divisor, and no spaces.
 const SPEC: &[&str] = {
     match (cfg!(feature = "iec"), cfg!(feature = "1024")) {
         (false, false) => &["", "k", "M", "G", "T", "P", "E", "Z", "Y"], // SI (1000).
