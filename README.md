@@ -48,8 +48,8 @@ This crate implements a whole suite of:
 
 This crate doesn't have any dependencies, is well-tested, and is blazing fast, taking only ~50 ns to generate a representation! Checked with criterion benchmarks.
 
-This crate gets to 1.0! 🎉 Lots of improvements since the beginning...
-> Since 1.0, the `HumanRepr` was removed, now there are separate traits for each concept. I've realized that separate traits were better than a common one, so each can get their own impls and evolve freely. The trait names are also simpler: HumanCount, HumanDuration, and HumanThroughput.
+This crate gets to 1.0! 🎉 Lots of improvements to get here...
+> Since 1.0, the `HumanRepr` trait was removed, now there are separate traits for each concept. I've realized that separate traits were better, so I could only implement them where practicable, as well as evolve them independently. The trait names also got simpler: HumanCount, HumanDuration, and HumanThroughput.
 
 > Since version 0.11, the [`PartialEq`](`std::cmp::PartialEq`) impls for `&str` do not allocate any Strings too!
 > <br>I've developed a particularly interesting [`Write`](`std::fmt::Write`) impl, which compares partial sequences with what the [`Display`](`std::fmt::Display`) impl would be generating!
@@ -163,6 +163,7 @@ This is the simplest of them all, I just continually divide by the current divis
 Rounding is also handled so there's no truncation or bad scale, the number of decimals also increase the larger the scale gets, and `.0` and `.00` are also never generated.
 
 ## Changelog highlights
+- 1.0.x Jul 26, 2022: `HumanRepr` trait was removed, now there are separate traits for each concept: `HumanCount`, `HumanDuration`, and `HumanThroughput`.
 - 0.11.x Jul 22, 2022: new PartialEq impls for `&str`, which is even faster and does not allocate any Strings
 - 0.10.x Jul 17, 2022: new Debug impl with raw and rendered values, new "bare unit" method variations, remove `space` from default features
 - 0.9.x Jun 22, 2022: do not use captured identifiers in format strings, to support much broader Rust versions instead of only >= 1.58
