@@ -101,7 +101,7 @@ Then just `use` the needed traits!
 use human_repr::{HumanCount, HumanDuration, HumanThroughput};
 
 3000_u16.human_count("bytes");
--5i8.human_count_bytes();
+(-5i8).human_count_bytes();
 
 4244.32_f32.human_duration();
 0.000000000004432_f64.human_duration();

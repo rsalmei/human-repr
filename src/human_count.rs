@@ -60,14 +60,6 @@ impl<T: AsRef<str>> PartialEq<&str> for HumanCountData<T> {
     }
 }
 
-impl<T> ops::Neg for HumanCountData<T> {
-    type Output = HumanCountData<T>;
-
-    fn neg(self) -> Self::Output {
-        HumanCountData(-self.0, self.1)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use crate::HumanCount;
@@ -79,9 +71,9 @@ mod tests {
         assert_eq!("23B", 23u8.human_count_bytes());
         assert_eq!("23B", 23i8.human_count_bytes());
         assert_eq!("23.5B", 23.5123.human_count_bytes());
-        assert_eq!("-23B", -23i8.human_count_bytes());
+        assert_eq!("-23B", (-23i8).human_count_bytes());
         assert_eq!("1kB", 1025u16.human_count_bytes());
-        assert_eq!("-1kB", -1025i16.human_count_bytes());
+        assert_eq!("-1kB", (-1025i16).human_count_bytes());
         assert_eq!("43.2MB", 43214321u32.human_count_bytes());
         assert_eq!("23.4GB", 23403454432_u64.human_count_bytes());
         assert_eq!("23.43GB", 23433454432_u64.human_count_bytes());

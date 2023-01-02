@@ -53,14 +53,6 @@ impl<T: AsRef<str>> PartialEq<&str> for HumanThroughputData<T> {
     }
 }
 
-impl<T> ops::Neg for HumanThroughputData<T> {
-    type Output = HumanThroughputData<T>;
-
-    fn neg(self) -> Self::Output {
-        HumanThroughputData(-self.0, self.1)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use crate::HumanThroughput;
@@ -68,7 +60,7 @@ mod tests {
     #[test]
     fn operation() {
         assert_eq!("1B/s", 1.human_throughput_bytes());
-        assert_eq!("-1B/s", -1.human_throughput_bytes());
+        assert_eq!("-1B/s", (-1).human_throughput_bytes());
         assert_eq!("1.2MB/s", (1234567. / 1.).human_throughput_bytes());
         assert_eq!("10B/s", (10. / 1.).human_throughput_bytes());
         assert_eq!("30B/m", (1. / 2.).human_throughput_bytes());
