@@ -1,5 +1,5 @@
 use super::{rounded, HumanThroughputData, SPACE};
-use std::{fmt, ops};
+use std::fmt::{self, Debug, Display};
 
 const SPEC: &[(f64, &str, usize)] = &[
     (24., "/d", 2),
@@ -8,9 +8,9 @@ const SPEC: &[(f64, &str, usize)] = &[
     // "/s" in code.
 ];
 
-impl<T: AsRef<str>> fmt::Display for HumanThroughputData<T> {
+impl<T: Display> Display for HumanThroughputData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let (mut val, unit) = (self.0, self.1.as_ref());
+        let (mut val, unit) = (self.0, &self.1);
         val *= 60. * 60. * 24.;
         for &(size, scale, dec) in SPEC {
             match rounded(val, dec) {
@@ -28,26 +28,24 @@ impl<T: AsRef<str>> fmt::Display for HumanThroughputData<T> {
     }
 }
 
-impl<T: AsRef<str>> fmt::Debug for HumanThroughputData<T> {
+impl<T: Debug + Display> Debug for HumanThroughputData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut ds = f.debug_struct("HumanThroughput");
         ds.field("val", &self.0);
-        if !self.1.as_ref().is_empty() {
-            ds.field("unit", &self.1.as_ref());
-        }
+        ds.field("unit", &self.1);
         ds.finish()?;
         write!(f, " -> ")?;
         fmt::Display::fmt(self, f)
     }
 }
 
-impl<T: AsRef<str>> PartialEq<HumanThroughputData<T>> for &str {
+impl<T: Display> PartialEq<HumanThroughputData<T>> for &str {
     fn eq(&self, other: &HumanThroughputData<T>) -> bool {
-        super::display_compare(*self, other)
+        super::display_compare(self, other)
     }
 }
 
-impl<T: AsRef<str>> PartialEq<&str> for HumanThroughputData<T> {
+impl<T: Display> PartialEq<&str> for HumanThroughputData<T> {
     fn eq(&self, other: &&str) -> bool {
         other == self
     }
