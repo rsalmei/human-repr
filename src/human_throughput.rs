@@ -91,6 +91,7 @@ mod tests {
     fn flexibility() {
         assert_eq!("123MCrabs/s", 123e6.human_throughput("Crabs"));
         assert_eq!("123MCrabs/s", 123e6.human_throughput("Crabs".to_owned()));
+        assert_eq!("123MCrabs/s", 123e6.human_throughput(&"Crabs".to_owned()));
         assert_eq!("123M🦀/s", 123e6.human_throughput("🦀"));
         assert_eq!("12.3k°C/s", 123e2.human_throughput("°C"));
         assert_eq!("1.2°C/s", 123e-2.human_throughput("°C"));

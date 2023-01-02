@@ -85,6 +85,7 @@ mod tests {
     fn flexibility() {
         assert_eq!("123MCrabs", 123e6.human_count("Crabs"));
         assert_eq!("123MCrabs", 123e6.human_count("Crabs".to_owned()));
+        assert_eq!("123MCrabs", 123e6.human_count(&"Crabs".to_owned()));
         assert_eq!("123k🦀", 123e3.human_count("🦀"));
         assert_eq!("12.3k°C", 123e2.human_count("°C"));
         assert_eq!("1.2°C", 123e-2.human_count("°C"));
