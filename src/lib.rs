@@ -7,8 +7,11 @@ mod human_throughput;
 use std::fmt;
 use std::time::Duration;
 
+/// Human count repr generator.
 pub struct HumanCountData<T>(f64, T);
+/// Human duration repr generator.
 pub struct HumanDurationData(f64);
+/// Human throughput repr generator.
 pub struct HumanThroughputData<T>(f64, T);
 
 const BYTES: &str = "B";
