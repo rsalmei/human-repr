@@ -2,7 +2,7 @@ use super::{rounded, HumanDurationData, SPACE};
 use std::fmt;
 use std::time::Duration;
 
-const SPEC: &[(f64, f64, &str, usize)] = &[
+const SPEC: &[(f64, f64, &str, i8)] = &[
     (1e3, 1e3, "ns", 1),
     (1e3, 1e3, "µs", 1), // uses non-ASCII “µs” suffix.
     (1e3, 1e3, "ms", 1),

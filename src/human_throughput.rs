@@ -1,7 +1,7 @@
 use super::{rounded, HumanThroughputData, SPACE};
 use std::fmt::{self, Debug, Display};
 
-const SPEC: &[(f64, &str, usize)] = &[
+const SPEC: &[(f64, &str, i8)] = &[
     (24., "/d", 2),
     (60., "/h", 1),
     (60., "/m", 1),
