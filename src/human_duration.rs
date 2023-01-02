@@ -53,7 +53,7 @@ impl fmt::Debug for HumanDurationData {
 
 impl PartialEq<HumanDurationData> for &str {
     fn eq(&self, other: &HumanDurationData) -> bool {
-        super::display_compare(*self, other)
+        super::display_compare(self, other)
     }
 }
 
@@ -147,6 +147,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::needless_borrow)]
     fn ownership() {
         let mut a = 0.01;
         assert_eq!("10ms", a.human_duration());

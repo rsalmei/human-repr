@@ -91,6 +91,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::needless_borrow)]
     fn ownership() {
         let mut a = 42000;
         assert_eq!("42kB", a.human_count_bytes());
