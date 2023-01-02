@@ -1,4 +1,5 @@
-use super::{rounded, HumanThroughputData, SPACE};
+use super::HumanThroughputData;
+use crate::utils::{display_compare, rounded, SPACE};
 use std::fmt::{self, Debug, Display};
 
 const SPEC: &[(f64, &str, i8)] = &[
@@ -41,7 +42,7 @@ impl<T: Debug + Display> Debug for HumanThroughputData<T> {
 
 impl<T: Display> PartialEq<HumanThroughputData<T>> for &str {
     fn eq(&self, other: &HumanThroughputData<T>) -> bool {
-        super::display_compare(self, other)
+        display_compare(self, other)
     }
 }
 

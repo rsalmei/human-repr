@@ -1,4 +1,5 @@
-use super::{rounded, HumanDurationData, SPACE};
+use super::HumanDurationData;
+use crate::utils::{display_compare, rounded, SPACE};
 use std::fmt;
 use std::time::Duration;
 
@@ -53,7 +54,7 @@ impl fmt::Debug for HumanDurationData {
 
 impl PartialEq<HumanDurationData> for &str {
     fn eq(&self, other: &HumanDurationData) -> bool {
-        super::display_compare(self, other)
+        display_compare(self, other)
     }
 }
 

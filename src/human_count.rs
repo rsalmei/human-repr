@@ -1,4 +1,5 @@
-use super::{rounded, HumanCountData, SPACE};
+use super::HumanCountData;
+use crate::utils::{display_compare, rounded, SPACE};
 use std::fmt::{self, Debug, Display};
 
 // with default features we get: SI symbols, 1000 divisor, and no spaces.
@@ -48,7 +49,7 @@ impl<T: Debug + Display> Debug for HumanCountData<T> {
 
 impl<T: Display> PartialEq<HumanCountData<T>> for &str {
     fn eq(&self, other: &HumanCountData<T>) -> bool {
-        super::display_compare(self, other)
+        display_compare(self, other)
     }
 }
 
