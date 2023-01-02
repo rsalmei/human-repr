@@ -131,9 +131,9 @@ mod tests {
         assert_eq!("1s", d!(1.).human_duration());
         assert_eq!("1.5s", d!(1.5).human_duration());
         assert_eq!("1ns", d!(0.00000000123).human_duration());
-        assert_eq!("1ns", d!(0.00000000185).human_duration());
+        assert_eq!("2ns", d!(0.00000000185).human_duration());
         assert_eq!("1ns", d!(0, 1).human_duration());
-        assert_eq!("999ns", d!(0.000000999999999).human_duration());
+        assert_eq!("1µs", d!(0.000000999999999).human_duration());
         assert_eq!("1µs", d!(0, 1000).human_duration());
         assert_eq!("10µs", d!(0, 10000).human_duration());
         assert_eq!("15.6µs", d!(0, 15600).human_duration());
