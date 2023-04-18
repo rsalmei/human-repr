@@ -1,6 +1,6 @@
-use super::{rounded, HumanDurationData, SPACE};
-use std::fmt;
-use std::time::Duration;
+use super::{HumanDuration, HumanDurationData};
+use crate::utils::{self, SPACE};
+use std::{fmt, time::Duration};
 
 const SPEC: &[(f64, f64, &str, usize)] = &[
     (1e3, 1e3, "ns", 1),
@@ -15,7 +15,7 @@ impl fmt::Display for HumanDurationData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut val = self.0 * 1e9;
         for &(size, next, scale, dec) in SPEC {
-            match rounded(val, dec) {
+            match utils::rounded(val, dec) {
                 r if r.abs() >= size => val /= next,
                 r if r.fract() == 0. => return write!(f, "{:.0}{}{}", r, SPACE, scale),
                 r if (r * 10.).fract() == 0. => return write!(f, "{:.1}{}{}", r, SPACE, scale),
@@ -23,12 +23,12 @@ impl fmt::Display for HumanDurationData {
             }
         }
 
-        val = rounded(val, 1);
+        val = utils::rounded(val, 1);
         let (m, s) = (val / 60., val % 60.);
         match m < 60. {
             true => match s {
                 _ if s.fract() == 0. => write!(f, "{}:{:02}", m.trunc(), s),
-                _ => write!(f, "{}:{:04}", m.trunc(), rounded(s, 1)),
+                _ => write!(f, "{}:{:04}", m.trunc(), utils::rounded(s, 1)),
             },
             false => write!(
                 f,
@@ -53,7 +53,7 @@ impl fmt::Debug for HumanDurationData {
 
 impl PartialEq<HumanDurationData> for &str {
     fn eq(&self, other: &HumanDurationData) -> bool {
-        super::display_compare(self, other)
+        utils::display_compare(self, other)
     }
 }
 
@@ -65,8 +65,13 @@ impl PartialEq<&str> for HumanDurationData {
 
 impl From<Duration> for HumanDurationData {
     fn from(d: Duration) -> Self {
-        use crate::HumanDuration;
         d.as_secs_f64().human_duration()
+    }
+}
+
+impl HumanDuration for Duration {
+    fn human_duration(self) -> HumanDurationData {
+        self.into()
     }
 }
 

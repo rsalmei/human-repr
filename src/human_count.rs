@@ -1,4 +1,5 @@
-use super::{rounded, HumanCountData, SPACE};
+use super::HumanCountData;
+use crate::utils::{self, SPACE};
 use std::fmt::{self, Debug, Display};
 
 // with default features we get: SI symbols, 1000 divisor, and no spaces.
@@ -21,7 +22,7 @@ impl<T: Display> Display for HumanCountData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let (mut val, unit) = (self.0, &self.1);
         for (&scale, &dec) in SPEC.iter().zip(DECIMALS) {
-            match rounded(val, dec) {
+            match utils::rounded(val, dec) {
                 r if r.abs() >= DIVISOR => val /= DIVISOR,
                 r if r.fract() == 0. => return write!(f, "{:.0}{}{}{}", r, SPACE, scale, unit),
                 r if (r * 10.).fract() == 0. => {
@@ -48,7 +49,7 @@ impl<T: Debug + Display> Debug for HumanCountData<T> {
 
 impl<T: Display> PartialEq<HumanCountData<T>> for &str {
     fn eq(&self, other: &HumanCountData<T>) -> bool {
-        super::display_compare(self, other)
+        utils::display_compare(self, other)
     }
 }
 

@@ -1,4 +1,5 @@
-use super::{rounded, HumanThroughputData, SPACE};
+use super::HumanThroughputData;
+use crate::utils::{self, SPACE};
 use std::fmt::{self, Debug, Display};
 
 const SPEC: &[(f64, &str, usize)] = &[
@@ -13,7 +14,7 @@ impl<T: Display> Display for HumanThroughputData<T> {
         let (mut val, unit) = (self.0, &self.1);
         val *= 60. * 60. * 24.;
         for &(size, scale, dec) in SPEC {
-            match rounded(val, dec) {
+            match utils::rounded(val, dec) {
                 r if r.abs() >= size => val /= size,
                 r if r.fract() == 0. => return write!(f, "{:.0}{}{}{}", r, SPACE, unit, scale),
                 r if (r * 10.).fract() == 0. => {
@@ -41,7 +42,7 @@ impl<T: Debug + Display> Debug for HumanThroughputData<T> {
 
 impl<T: Display> PartialEq<HumanThroughputData<T>> for &str {
     fn eq(&self, other: &HumanThroughputData<T>) -> bool {
-        super::display_compare(self, other)
+        utils::display_compare(self, other)
     }
 }
 

@@ -3,9 +3,7 @@
 mod human_count;
 mod human_duration;
 mod human_throughput;
-
-use std::fmt;
-use std::time::Duration;
+mod utils;
 
 /// Human count repr generator.
 pub struct HumanCountData<T>(f64, T);
@@ -16,10 +14,9 @@ pub struct HumanThroughputData<T>(f64, T);
 
 const BYTES: &str = "B";
 
-/// Human representation count trait, already implemented for all Rust primitive number types.
+/// Human representation count trait, supporting all Rust primitive number types.
 pub trait HumanCount: sealed::Sealed + Sized {
-    /// Generate a beautiful human-readable count, supporting SI/IEC prefixes to indicate multiples,
-    /// and your custom unit.
+    /// Generate beautiful human-readable counts supporting automatic prefixes and custom units.
     ///
     /// ```
     /// use human_repr::HumanCount;
@@ -27,8 +24,7 @@ pub trait HumanCount: sealed::Sealed + Sized {
     /// ```
     fn human_count<T>(self, unit: T) -> HumanCountData<T>;
 
-    /// Generate a beautiful human-readable count, supporting SI/IEC prefixes to indicate multiples,
-    /// and an empty unit.
+    /// Generate beautiful human-readable counts supporting automatic prefixes.
     ///
     /// ```
     /// use human_repr::HumanCount;
@@ -38,8 +34,7 @@ pub trait HumanCount: sealed::Sealed + Sized {
         self.human_count("")
     }
 
-    /// Generate a beautiful human-readable count, supporting SI/IEC prefixes to indicate multiples,
-    /// and bytes `"B"` as the unit.
+    /// Generate beautiful human-readable counts supporting automatic prefixes and Bytes `B` as the unit.
     ///
     /// ```
     /// use human_repr::HumanCount;
@@ -50,18 +45,17 @@ pub trait HumanCount: sealed::Sealed + Sized {
     }
 }
 
-/// Human representation duration trait, already implemented for all Rust primitive number types.
+/// Human representation duration trait, supporting all Rust primitive number types and Duration.
 pub trait HumanDuration: sealed::Sealed + Sized {
-    /// Generate a beautiful human-readable duration, supporting SI prefixes nanos (`ns`), micros (`µs`),
-    /// millis (`ms`), and seconds (`s`), in addition to minutes (`M:SS`) and even hours (`H:MM:SS`).
+    /// Generate beautiful human-readable durations supporting automatic prefixes.
     ///
-    /// Use either on primitives:
+    /// Use either with primitives:
     /// ```
     /// use human_repr::HumanDuration;
     /// assert_eq!("160ms", 0.1599999.human_duration());
     /// ```
     ///
-    /// Or on [`Duration`](`std::time::Duration`)s:
+    /// Or with [`Duration`](`std::time::Duration`)s:
     /// ```
     /// use human_repr::HumanDuration;
     /// use std::time::Duration;
@@ -72,10 +66,9 @@ pub trait HumanDuration: sealed::Sealed + Sized {
     fn human_duration(self) -> HumanDurationData;
 }
 
-/// Human representation throughput trait, already implemented for all Rust primitive number types.
+/// Human representation throughput trait, supporting all Rust primitive number types.
 pub trait HumanThroughput: sealed::Sealed + Sized {
-    /// Generate a beautiful human-readable throughput, supporting per-day (`/d`), per-hour (`/h`),
-    /// per-month (`/m`), and per-sec (`/s`), and your custom unit.
+    /// Generate beautiful human-readable throughputs supporting automatic prefixes and custom units.
     ///
     /// ```
     /// use human_repr::HumanThroughput;
@@ -83,8 +76,7 @@ pub trait HumanThroughput: sealed::Sealed + Sized {
     /// ```
     fn human_throughput<T>(self, unit: T) -> HumanThroughputData<T>;
 
-    /// Generate a beautiful human-readable throughput, supporting per-day (`/d`), per-hour (`/h`),
-    /// per-month (`/m`), and per-sec (`/s`), and an empty unit.
+    /// Generate beautiful human-readable throughputs supporting automatic prefixes.
     ///
     /// ```
     /// use human_repr::HumanThroughput;
@@ -94,8 +86,7 @@ pub trait HumanThroughput: sealed::Sealed + Sized {
         self.human_throughput("")
     }
 
-    /// Generate a beautiful human-readable throughput, supporting per-day (`/d`), per-hour (`/h`),
-    /// per-month (`/m`), and per-sec (`/s`), and bytes `"B"` as the unit.
+    /// Generate beautiful human-readable throughputs supporting automatic prefixes and Bytes `B` as the unit.
     ///
     /// ```
     /// use human_repr::HumanThroughput;
@@ -127,12 +118,6 @@ macro_rules! impl_trait {
 }
 impl_trait!(u8, u16, u32, u64, u128, usize, f32, f64, i8, i16, i32, i64, i128, isize);
 
-impl HumanDuration for Duration {
-    fn human_duration(self) -> HumanDurationData {
-        self.into()
-    }
-}
-
 mod sealed {
     use std::time::Duration;
 
@@ -145,38 +130,4 @@ mod sealed {
     impl_sealed!(
         u8, u16, u32, u64, u128, usize, f32, f64, i8, i16, i32, i64, i128, isize, Duration
     );
-}
-
-const SPACE: &str = {
-    match cfg!(feature = "space") {
-        true => " ",
-        false => "",
-    }
-};
-
-#[inline]
-fn rounded(val: f64, dec: usize) -> f64 {
-    match dec {
-        0 => val.round(),
-        1 => (val * 10.).round() / 10.,
-        2 => (val * 100.).round() / 100.,
-        _ => unreachable!(),
-    }
-}
-
-struct DisplayCompare<'a, I>(&'a mut I);
-
-impl<I: Iterator<Item = u8>> fmt::Write for DisplayCompare<'_, I> {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
-        match s.bytes().zip(self.0.by_ref()).all(|(x, y)| x == y) {
-            true => Ok(()),
-            false => Err(fmt::Error),
-        }
-    }
-}
-
-fn display_compare(str: &str, display: &impl fmt::Display) -> bool {
-    let mut it = str.bytes();
-    use fmt::Write;
-    write!(DisplayCompare(it.by_ref()), "{display}").map_or(false, |_| it.len() == 0)
 }
