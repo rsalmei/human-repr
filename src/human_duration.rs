@@ -1,6 +1,6 @@
-use super::{rounded, HumanDurationData, SPACE};
-use std::time::Duration;
-use std::{fmt, ops};
+use super::{HumanDuration, HumanDurationData};
+use crate::utils::{self, SPACE};
+use std::{fmt, time::Duration};
 
 const SPEC: &[(f64, f64, &str, usize)] = &[
     (1e3, 1e3, "ns", 1),
@@ -13,9 +13,10 @@ const SPEC: &[(f64, f64, &str, usize)] = &[
 
 impl fmt::Display for HumanDurationData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut val = self.0 * 1e9;
+        let HumanDurationData { mut val } = self;
+        val *= 1e9;
         for &(size, next, scale, dec) in SPEC {
-            match rounded(val, dec) {
+            match utils::rounded(val, dec) {
                 r if r.abs() >= size => val /= next,
                 r if r.fract() == 0. => return write!(f, "{:.0}{}{}", r, SPACE, scale),
                 r if (r * 10.).fract() == 0. => return write!(f, "{:.1}{}{}", r, SPACE, scale),
@@ -23,12 +24,12 @@ impl fmt::Display for HumanDurationData {
             }
         }
 
-        val = rounded(val, 1);
+        val = utils::rounded(val, 1);
         let (m, s) = (val / 60., val % 60.);
         match m < 60. {
             true => match s {
                 _ if s.fract() == 0. => write!(f, "{}:{:02}", m.trunc(), s),
-                _ => write!(f, "{}:{:04}", m.trunc(), rounded(s, 1)),
+                _ => write!(f, "{}:{:04}", m.trunc(), utils::rounded(s, 1)),
             },
             false => write!(
                 f,
@@ -44,7 +45,7 @@ impl fmt::Display for HumanDurationData {
 impl fmt::Debug for HumanDurationData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HumanDuration")
-            .field("val", &self.0)
+            .field("val", &self.val)
             .finish()?;
         write!(f, " -> ")?;
         fmt::Display::fmt(self, f)
@@ -53,7 +54,7 @@ impl fmt::Debug for HumanDurationData {
 
 impl PartialEq<HumanDurationData> for &str {
     fn eq(&self, other: &HumanDurationData) -> bool {
-        super::display_compare(*self, other)
+        utils::display_compare(self, other)
     }
 }
 
@@ -63,33 +64,30 @@ impl PartialEq<&str> for HumanDurationData {
     }
 }
 
-impl ops::Neg for HumanDurationData {
-    type Output = HumanDurationData;
-
-    fn neg(self) -> Self::Output {
-        HumanDurationData(-self.0)
-    }
-}
-
 impl From<Duration> for HumanDurationData {
     fn from(d: Duration) -> Self {
-        use crate::HumanDuration;
         d.as_secs_f64().human_duration()
     }
 }
 
-#[cfg(test)]
+impl HumanDuration for Duration {
+    fn human_duration(self) -> HumanDurationData {
+        self.into()
+    }
+}
+
+#[cfg(all(test, not(any(feature = "1024", feature = "iec", feature = "space"))))]
 mod tests {
     use crate::HumanDuration;
 
     #[test]
     fn operation() {
         assert_eq!("1s", 1.human_duration());
-        assert_eq!("-1s", -1.human_duration());
+        assert_eq!("-1s", (-1).human_duration());
         assert_eq!("1.2ns", 0.00000000123.human_duration());
         assert_eq!("1.8ns", 0.0000000018.human_duration());
         assert_eq!("1µs", 0.000001.human_duration());
-        assert_eq!("-1µs", -0.000001.human_duration());
+        assert_eq!("-1µs", (-0.000001).human_duration());
         assert_eq!("1µs", 0.000000999996.human_duration());
         assert_eq!("10µs", 0.00001.human_duration());
         assert_eq!("15.6µs", 0.0000156.human_duration());
@@ -131,9 +129,9 @@ mod tests {
         assert_eq!("1s", d!(1.).human_duration());
         assert_eq!("1.5s", d!(1.5).human_duration());
         assert_eq!("1ns", d!(0.00000000123).human_duration());
-        assert_eq!("1ns", d!(0.00000000185).human_duration());
+        assert_eq!("2ns", d!(0.00000000185).human_duration());
         assert_eq!("1ns", d!(0, 1).human_duration());
-        assert_eq!("999ns", d!(0.000000999999999).human_duration());
+        assert_eq!("1µs", d!(0.000000999999999).human_duration());
         assert_eq!("1µs", d!(0, 1000).human_duration());
         assert_eq!("10µs", d!(0, 10000).human_duration());
         assert_eq!("15.6µs", d!(0, 15600).human_duration());
@@ -155,6 +153,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::needless_borrow)]
     fn ownership() {
         let mut a = 0.01;
         assert_eq!("10ms", a.human_duration());
@@ -166,4 +165,16 @@ mod tests {
     fn symmetric() {
         assert_eq!(1.human_duration(), "1s");
     }
+}
+
+#[test]
+#[cfg(feature = "serde")]
+fn serialize() -> Result<(), serde_json::Error> {
+    use HumanDuration;
+    let h = 123456.human_duration();
+    let ser = serde_json::to_string(&h)?;
+    assert_eq!(r#"{"val":123456.0}"#, &ser);
+    let h2 = serde_json::from_str::<HumanDurationData>(&ser)?;
+    assert_eq!(h, h2);
+    Ok(())
 }

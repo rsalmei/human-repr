@@ -2,16 +2,16 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use human_repr::HumanThroughput;
 use std::fmt::Write;
 
-pub struct Null;
+pub struct Void;
 
-impl Write for Null {
+impl Write for Void {
     fn write_str(&mut self, _s: &str) -> std::fmt::Result {
         Ok(())
     }
 }
 
 fn benchmark<T: HumanThroughput>(val: T) {
-    let _ = write!(Null, "{}", black_box(val).human_throughput_bytes());
+    let _ = write!(Void, "{}", black_box(val).human_throughput_bytes());
 }
 
 pub fn small(c: &mut Criterion) {
