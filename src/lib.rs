@@ -8,12 +8,14 @@ mod human_duration;
 mod human_throughput;
 mod utils;
 
+use std::borrow::Cow;
+
 /// Human Count data, ready to generate Debug and Display representations.
 #[derive(PartialEq, PartialOrd)] // Debug and Display impls in the specific module.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct HumanCountData<T> {
+pub struct HumanCountData<'a> {
     val: f64,
-    unit: T,
+    unit: Cow<'a, str>,
 }
 
 /// Human Duration data, ready to generate Debug and Display representations.
@@ -26,9 +28,9 @@ pub struct HumanDurationData {
 /// Human Throughput data, ready to generate Debug and Display representations.
 #[derive(PartialEq, PartialOrd)] // Debug and Display impls in the specific module.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct HumanThroughputData<T> {
+pub struct HumanThroughputData<'a> {
     val: f64,
-    unit: T,
+    unit: Cow<'a, str>,
 }
 
 const BYTES: &str = "B";
@@ -46,7 +48,7 @@ assert_eq!("4.2Mcoins", 4221432u32.human_count("coins"));
 ```
 "#
     )]
-    fn human_count<T>(self, unit: T) -> HumanCountData<T>;
+    fn human_count<'a>(self, unit: impl Into<Cow<'a, str>>) -> HumanCountData<'a>;
 
     /// Generate beautiful human-readable counts supporting automatic prefixes.
     #[cfg_attr(
@@ -59,7 +61,7 @@ assert_eq!("4.2M", 4221432u32.human_count_bare());
 ```
 "#
     )]
-    fn human_count_bare(self) -> HumanCountData<&'static str> {
+    fn human_count_bare(self) -> HumanCountData<'static> {
         self.human_count("")
     }
 
@@ -74,7 +76,7 @@ assert_eq!("4.2MB", 4221432u32.human_count_bytes());
 ```
 "#
     )]
-    fn human_count_bytes(self) -> HumanCountData<&'static str> {
+    fn human_count_bytes(self) -> HumanCountData<'static> {
         self.human_count(BYTES)
     }
 }
@@ -118,7 +120,7 @@ assert_eq!("1.2k°C/s", 1234.5.human_throughput("°C"));
 ```
 "#
     )]
-    fn human_throughput<T>(self, unit: T) -> HumanThroughputData<T>;
+    fn human_throughput<'a>(self, unit: impl Into<Cow<'a, str>>) -> HumanThroughputData<'a>;
 
     /// Generate beautiful human-readable throughputs supporting automatic prefixes.
     #[cfg_attr(
@@ -131,7 +133,7 @@ assert_eq!("1.2k/s", 1234.5.human_throughput_bare());
 ```
 "#
     )]
-    fn human_throughput_bare(self) -> HumanThroughputData<&'static str> {
+    fn human_throughput_bare(self) -> HumanThroughputData<'static> {
         self.human_throughput("")
     }
 
@@ -146,7 +148,7 @@ assert_eq!("1.2kB/s", 1234.5.human_throughput_bytes());
 ```
 "#
     )]
-    fn human_throughput_bytes(self) -> HumanThroughputData<&'static str> {
+    fn human_throughput_bytes(self) -> HumanThroughputData<'static> {
         self.human_throughput(BYTES)
     }
 }
@@ -154,8 +156,8 @@ assert_eq!("1.2kB/s", 1234.5.human_throughput_bytes());
 macro_rules! impl_trait {
     {$($t:ty),+} => {$(
         impl HumanCount for $t {
-            fn human_count<T>(self, unit: T) -> HumanCountData<T> {
-                HumanCountData{val: self as f64, unit}
+            fn human_count<'a>(self, unit: impl Into<Cow<'a, str>>) -> HumanCountData<'a> {
+                HumanCountData{val: self as f64, unit: unit.into()}
             }
         }
         impl HumanDuration for $t {
@@ -164,8 +166,8 @@ macro_rules! impl_trait {
             }
         }
         impl HumanThroughput for $t {
-            fn human_throughput<T>(self, unit: T) -> HumanThroughputData<T> {
-                HumanThroughputData{val: self as f64, unit}
+            fn human_throughput<'a>(self, unit: impl Into<Cow<'a, str>>) -> HumanThroughputData<'a> {
+                HumanThroughputData{val: self as f64, unit: unit.into()}
             }
         }
     )+}

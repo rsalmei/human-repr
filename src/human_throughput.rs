@@ -9,7 +9,7 @@ const SPEC: &[(f64, &str, usize)] = &[
     // "/s" in code.
 ];
 
-impl<T: Display> Display for HumanThroughputData<T> {
+impl Display for HumanThroughputData<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let HumanThroughputData { mut val, unit } = self;
         val *= 60. * 60. * 24.;
@@ -25,11 +25,11 @@ impl<T: Display> Display for HumanThroughputData<T> {
         }
 
         use super::HumanCount;
-        write!(f, "{}/s", val.human_count(unit))
+        write!(f, "{}/s", val.human_count(unit.as_ref()))
     }
 }
 
-impl<T: Debug + Display> Debug for HumanThroughputData<T> {
+impl Debug for HumanThroughputData<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut ds = f.debug_struct("HumanThroughput");
         ds.field("val", &self.val);
@@ -40,13 +40,13 @@ impl<T: Debug + Display> Debug for HumanThroughputData<T> {
     }
 }
 
-impl<T: Display> PartialEq<HumanThroughputData<T>> for &str {
-    fn eq(&self, other: &HumanThroughputData<T>) -> bool {
+impl PartialEq<HumanThroughputData<'_>> for &str {
+    fn eq(&self, other: &HumanThroughputData<'_>) -> bool {
         utils::display_compare(self, other)
     }
 }
 
-impl<T: Display> PartialEq<&str> for HumanThroughputData<T> {
+impl PartialEq<&str> for HumanThroughputData<'_> {
     fn eq(&self, other: &&str) -> bool {
         other == self
     }
@@ -120,7 +120,7 @@ fn serialize() -> Result<(), serde_json::Error> {
     let h = 123456.human_throughput("X");
     let ser = serde_json::to_string(&h)?;
     assert_eq!(r#"{"val":123456.0,"unit":"X"}"#, &ser);
-    let h2 = serde_json::from_str::<HumanThroughputData<&str>>(&ser)?;
+    let h2 = serde_json::from_str::<HumanThroughputData>(&ser)?;
     assert_eq!(h, h2);
     Ok(())
 }

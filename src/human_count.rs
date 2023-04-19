@@ -18,7 +18,7 @@ const DIVISOR: f64 = {
     }
 };
 
-impl<T: Display> Display for HumanCountData<T> {
+impl Display for HumanCountData<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let HumanCountData { mut val, unit } = self;
         for (&scale, &dec) in SPEC.iter().zip(DECIMALS) {
@@ -36,7 +36,7 @@ impl<T: Display> Display for HumanCountData<T> {
     }
 }
 
-impl<T: Debug + Display> Debug for HumanCountData<T> {
+impl Debug for HumanCountData<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut ds = f.debug_struct("HumanCount");
         ds.field("val", &self.val);
@@ -47,13 +47,13 @@ impl<T: Debug + Display> Debug for HumanCountData<T> {
     }
 }
 
-impl<T: Display> PartialEq<HumanCountData<T>> for &str {
-    fn eq(&self, other: &HumanCountData<T>) -> bool {
+impl PartialEq<HumanCountData<'_>> for &str {
+    fn eq(&self, other: &HumanCountData<'_>) -> bool {
         utils::display_compare(self, other)
     }
 }
 
-impl<T: Display> PartialEq<&str> for HumanCountData<T> {
+impl PartialEq<&str> for HumanCountData<'_> {
     fn eq(&self, other: &&str) -> bool {
         other == self
     }
@@ -114,7 +114,7 @@ fn serialize() -> Result<(), serde_json::Error> {
     let h = 123456.human_count("X");
     let ser = serde_json::to_string(&h)?;
     assert_eq!(r#"{"val":123456.0,"unit":"X"}"#, &ser);
-    let h2 = serde_json::from_str::<HumanCountData<&str>>(&ser)?;
+    let h2 = serde_json::from_str::<HumanCountData>(&ser)?;
     assert_eq!(h, h2);
     Ok(())
 }

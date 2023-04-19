@@ -11,9 +11,9 @@ mod tests {
         #[derive(Debug, PartialEq, Serialize, Deserialize)]
         #[serde(bound(deserialize = "'de: 'a"))]
         enum Data<'a> {
-            Count(HumanCountData<&'a str>),
+            Count(HumanCountData<'a>),
             Duration(HumanDurationData),
-            Throughput(HumanThroughputData<&'a str>),
+            Throughput(HumanThroughputData<'a>),
         }
         let list = [
             Data::Count(123456.human_count("C")),
