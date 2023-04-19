@@ -8,7 +8,7 @@ mod human_duration;
 mod human_throughput;
 mod utils;
 
-/// Human count data, ready to generate Debug and Display representations.
+/// Human Count data, ready to generate Debug and Display representations.
 #[derive(PartialEq, PartialOrd)] // Debug and Display impls in the specific module.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HumanCountData<T> {
@@ -16,14 +16,14 @@ pub struct HumanCountData<T> {
     unit: T,
 }
 
-/// Human duration data, ready to generate Debug and Display representations.
+/// Human Duration data, ready to generate Debug and Display representations.
 #[derive(PartialEq, PartialOrd)] // Debug and Display impls in the specific module.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HumanDurationData {
     val: f64,
 }
 
-/// Human throughput data, ready to generate Debug and Display representations.
+/// Human Throughput data, ready to generate Debug and Display representations.
 #[derive(PartialEq, PartialOrd)] // Debug and Display impls in the specific module.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HumanThroughputData<T> {
@@ -33,7 +33,7 @@ pub struct HumanThroughputData<T> {
 
 const BYTES: &str = "B";
 
-/// Human Count functionality provider, supporting all Rust primitive number types.
+/// Human Count trait, supporting all Rust primitive number types.
 pub trait HumanCount: sealed::Sealed + Sized {
     /// Generate beautiful human-readable counts supporting automatic prefixes and custom units.
     #[cfg_attr(
@@ -79,7 +79,7 @@ assert_eq!("4.2MB", 4221432u32.human_count_bytes());
     }
 }
 
-/// Human Duration functionality provider, supporting all Rust primitive number types and Duration.
+/// Human Duration trait, supporting all Rust primitive number types and Duration.
 pub trait HumanDuration: sealed::Sealed + Sized {
     /// Generate beautiful human-readable durations supporting automatic prefixes.
     #[cfg_attr(
@@ -105,7 +105,7 @@ assert_eq!("160ms", d.human_duration());
     fn human_duration(self) -> HumanDurationData;
 }
 
-/// Human Throughput functionality provider, supporting all Rust primitive number types.
+/// Human Throughput trait, supporting all Rust primitive number types.
 pub trait HumanThroughput: sealed::Sealed + Sized {
     /// Generate beautiful human-readable throughputs supporting automatic prefixes and custom units.
     #[cfg_attr(
