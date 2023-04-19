@@ -15,7 +15,7 @@ fn benchmark<T: HumanCount>(val: T) {
 }
 
 pub fn small(c: &mut Criterion) {
-    c.bench_function("human-count", |b| b.iter(|| benchmark(1_u32)));
+    c.bench_function("human-count", |b| b.iter(|| benchmark(1_f64)));
 }
 
 criterion_group!(benches, small);
