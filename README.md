@@ -104,21 +104,17 @@ Add this dependency to your Cargo.toml file:
 human-repr = "1"
 ```
 
-Then just `use` the needed traits!
+Then just `use` the traits as you need! E.g.:
 
 ```rust
 use human_repr::{HumanCount, HumanDuration, HumanThroughput};
 
-3000_u16.human_count("bytes");
-(-5i8).human_count_bytes();
+let now = std::time::Instant::now();
+let updated = 3431237; // process something...
 
-4244.32_f32.human_duration();
-0.000000000004432_f64.human_duration();
-# use std::time::Duration;
-Duration::from_secs_f64(0.00432).human_duration();
-
-8987_isize.human_throughput("transactions");
-93321_usize.human_throughput_bytes();
+println!("Updated {} successfully.", updated.human_count_bytes());
+println!("Operation took {}.", now.elapsed().human_duration());
+println!("Rate: {}", (updated as f64 / now.elapsed().as_secs_f64()).human_throughput_bytes());
 ```
 
 They work on all Rust primitive number types: `u8`, `u16`, `u32`, `u64`, `u128`, `usize`, `f32`,
