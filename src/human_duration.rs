@@ -166,3 +166,15 @@ mod tests {
         assert_eq!(1.human_duration(), "1s");
     }
 }
+
+#[test]
+#[cfg(feature = "serde")]
+fn serialize() -> Result<(), serde_json::Error> {
+    use HumanDuration;
+    let h = 123456.human_duration();
+    let ser = serde_json::to_string(&h)?;
+    assert_eq!(r#"{"val":123456.0}"#, &ser);
+    let h2 = serde_json::from_str::<HumanDurationData>(&ser)?;
+    assert_eq!(h, h2);
+    Ok(())
+}

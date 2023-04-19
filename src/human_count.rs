@@ -106,3 +106,15 @@ mod tests {
         assert_eq!(123000_u64.human_count_bytes(), "123kB");
     }
 }
+
+#[test]
+#[cfg(feature = "serde")]
+fn serialize() -> Result<(), serde_json::Error> {
+    use crate::HumanCount;
+    let h = 123456.human_count("X");
+    let ser = serde_json::to_string(&h)?;
+    assert_eq!(r#"{"val":123456.0,"unit":"X"}"#, &ser);
+    let h2 = serde_json::from_str::<HumanCountData<&str>>(&ser)?;
+    assert_eq!(h, h2);
+    Ok(())
+}

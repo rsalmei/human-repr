@@ -112,3 +112,15 @@ mod tests {
         assert_eq!(1.human_throughput_bytes(), "1B/s");
     }
 }
+
+#[test]
+#[cfg(feature = "serde")]
+fn serialize() -> Result<(), serde_json::Error> {
+    use crate::HumanThroughput;
+    let h = 123456.human_throughput("X");
+    let ser = serde_json::to_string(&h)?;
+    assert_eq!(r#"{"val":123456.0,"unit":"X"}"#, &ser);
+    let h2 = serde_json::from_str::<HumanThroughputData<&str>>(&ser)?;
+    assert_eq!(h, h2);
+    Ok(())
+}
