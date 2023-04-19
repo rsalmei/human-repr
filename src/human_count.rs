@@ -20,7 +20,7 @@ const DIVISOR: f64 = {
 
 impl<T: Display> Display for HumanCountData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let (mut val, unit) = (self.0, &self.1);
+        let HumanCountData { mut val, unit } = self;
         for (&scale, &dec) in SPEC.iter().zip(DECIMALS) {
             match utils::rounded(val, dec) {
                 r if r.abs() >= DIVISOR => val /= DIVISOR,
@@ -39,8 +39,8 @@ impl<T: Display> Display for HumanCountData<T> {
 impl<T: Debug + Display> Debug for HumanCountData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut ds = f.debug_struct("HumanCount");
-        ds.field("val", &self.0);
-        ds.field("unit", &self.1);
+        ds.field("val", &self.val);
+        ds.field("unit", &self.unit);
         ds.finish()?;
         write!(f, " -> ")?;
         fmt::Display::fmt(self, f)

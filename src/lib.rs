@@ -5,12 +5,28 @@ mod human_duration;
 mod human_throughput;
 mod utils;
 
-/// Human count repr generator.
-pub struct HumanCountData<T>(f64, T);
-/// Human duration repr generator.
-pub struct HumanDurationData(f64);
-/// Human throughput repr generator.
-pub struct HumanThroughputData<T>(f64, T);
+/// Human count data, ready to generate Debug and Display representations.
+#[derive(PartialEq, PartialOrd)] // Debug and Display impls in the specific module.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct HumanCountData<T> {
+    val: f64,
+    unit: T,
+}
+
+/// Human duration data, ready to generate Debug and Display representations.
+#[derive(PartialEq, PartialOrd)] // Debug and Display impls in the specific module.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct HumanDurationData {
+    val: f64,
+}
+
+/// Human throughput data, ready to generate Debug and Display representations.
+#[derive(PartialEq, PartialOrd)] // Debug and Display impls in the specific module.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct HumanThroughputData<T> {
+    val: f64,
+    unit: T,
+}
 
 const BYTES: &str = "B";
 
@@ -101,17 +117,17 @@ macro_rules! impl_trait {
     {$($t:ty),+} => {$(
         impl HumanCount for $t {
             fn human_count<T>(self, unit: T) -> HumanCountData<T> {
-                HumanCountData(self as f64, unit)
+                HumanCountData{val: self as f64, unit}
             }
         }
         impl HumanDuration for $t {
             fn human_duration(self) -> HumanDurationData {
-                HumanDurationData(self as f64)
+                HumanDurationData{val: self as f64}
             }
         }
         impl HumanThroughput for $t {
             fn human_throughput<T>(self, unit: T) -> HumanThroughputData<T> {
-                HumanThroughputData(self as f64, unit)
+                HumanThroughputData{val: self as f64, unit}
             }
         }
     )+}

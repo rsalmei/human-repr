@@ -13,7 +13,8 @@ const SPEC: &[(f64, f64, &str, usize)] = &[
 
 impl fmt::Display for HumanDurationData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut val = self.0 * 1e9;
+        let HumanDurationData { mut val } = self;
+        val *= 1e9;
         for &(size, next, scale, dec) in SPEC {
             match utils::rounded(val, dec) {
                 r if r.abs() >= size => val /= next,
@@ -44,7 +45,7 @@ impl fmt::Display for HumanDurationData {
 impl fmt::Debug for HumanDurationData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HumanDuration")
-            .field("val", &self.0)
+            .field("val", &self.val)
             .finish()?;
         write!(f, " -> ")?;
         fmt::Display::fmt(self, f)

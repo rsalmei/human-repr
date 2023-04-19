@@ -11,7 +11,7 @@ const SPEC: &[(f64, &str, usize)] = &[
 
 impl<T: Display> Display for HumanThroughputData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let (mut val, unit) = (self.0, &self.1);
+        let HumanThroughputData { mut val, unit } = self;
         val *= 60. * 60. * 24.;
         for &(size, scale, dec) in SPEC {
             match utils::rounded(val, dec) {
@@ -32,8 +32,8 @@ impl<T: Display> Display for HumanThroughputData<T> {
 impl<T: Debug + Display> Debug for HumanThroughputData<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut ds = f.debug_struct("HumanThroughput");
-        ds.field("val", &self.0);
-        ds.field("unit", &self.1);
+        ds.field("val", &self.val);
+        ds.field("unit", &self.unit);
         ds.finish()?;
         write!(f, " -> ")?;
         fmt::Display::fmt(self, f)
