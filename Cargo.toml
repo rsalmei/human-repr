@@ -1,6 +1,6 @@
 [package]
 name = "human-repr"
-version = "1.0.1"
+version = "1.1.0"
 edition = "2021"
 authors = ["Rogério Sampaio de Almeida <rsalmei@gmail.com>"]
 description = "Generate beautiful human representations of bytes, durations, and even throughputs!"
@@ -20,7 +20,7 @@ space = []
 serde = { version = "1", optional = true, features = ["derive"] }
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = "0.4"
 serde_json = "1"
 
 [[bench]]
