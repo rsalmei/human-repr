@@ -1,4 +1,7 @@
-#![doc = include_str!("../README.md")]
+#![cfg_attr(
+    not(any(feature = "1024", feature = "iec", feature = "space")), 
+    doc = include_str!("../README.md")
+)]
 
 mod human_count;
 mod human_duration;
@@ -33,29 +36,44 @@ const BYTES: &str = "B";
 /// Human representation count trait, supporting all Rust primitive number types.
 pub trait HumanCount: sealed::Sealed + Sized {
     /// Generate beautiful human-readable counts supporting automatic prefixes and custom units.
-    ///
-    /// ```
-    /// use human_repr::HumanCount;
-    /// assert_eq!("4.2Mcoins", 4221432u32.human_count("coins"));
-    /// ```
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "space")),
+        doc = r#"
+
+```
+use human_repr::HumanCount;
+assert_eq!("4.2Mcoins", 4221432u32.human_count("coins"));
+```
+"#
+    )]
     fn human_count<T>(self, unit: T) -> HumanCountData<T>;
 
     /// Generate beautiful human-readable counts supporting automatic prefixes.
-    ///
-    /// ```
-    /// use human_repr::HumanCount;
-    /// assert_eq!("4.2M", 4221432u32.human_count_bare());
-    /// ```
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "space")),
+        doc = r#"
+
+```
+use human_repr::HumanCount;
+assert_eq!("4.2M", 4221432u32.human_count_bare());
+```
+"#
+    )]
     fn human_count_bare(self) -> HumanCountData<&'static str> {
         self.human_count("")
     }
 
     /// Generate beautiful human-readable counts supporting automatic prefixes and Bytes `B` as the unit.
-    ///
-    /// ```
-    /// use human_repr::HumanCount;
-    /// assert_eq!("4.2MB", 4221432u32.human_count_bytes());
-    /// ```
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "space")),
+        doc = r#"
+
+```
+use human_repr::HumanCount;
+assert_eq!("4.2MB", 4221432u32.human_count_bytes());
+```
+"#
+    )]
     fn human_count_bytes(self) -> HumanCountData<&'static str> {
         self.human_count(BYTES)
     }
@@ -64,50 +82,70 @@ pub trait HumanCount: sealed::Sealed + Sized {
 /// Human representation duration trait, supporting all Rust primitive number types and Duration.
 pub trait HumanDuration: sealed::Sealed + Sized {
     /// Generate beautiful human-readable durations supporting automatic prefixes.
-    ///
-    /// Use either with primitives:
-    /// ```
-    /// use human_repr::HumanDuration;
-    /// assert_eq!("160ms", 0.1599999.human_duration());
-    /// ```
-    ///
-    /// Or with [`Duration`](`std::time::Duration`)s:
-    /// ```
-    /// use human_repr::HumanDuration;
-    /// use std::time::Duration;
-    ///
-    /// let d = Duration::from_secs_f64(0.1599999);
-    /// assert_eq!("160ms", d.human_duration());
-    /// ```
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "space")),
+        doc = r#"
+
+Use either with primitives:
+```
+use human_repr::HumanDuration;
+assert_eq!("160ms", 0.1599999.human_duration());
+```
+
+Or with [`Duration`](`std::time::Duration`)s:
+```
+use human_repr::HumanDuration;
+use std::time::Duration;
+
+let d = Duration::from_secs_f64(0.1599999);
+assert_eq!("160ms", d.human_duration());
+```
+"#
+    )]
     fn human_duration(self) -> HumanDurationData;
 }
 
 /// Human representation throughput trait, supporting all Rust primitive number types.
 pub trait HumanThroughput: sealed::Sealed + Sized {
     /// Generate beautiful human-readable throughputs supporting automatic prefixes and custom units.
-    ///
-    /// ```
-    /// use human_repr::HumanThroughput;
-    /// assert_eq!("1.2k°C/s", 1234.5.human_throughput("°C"));
-    /// ```
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "space")),
+        doc = r#"
+
+```
+use human_repr::HumanThroughput;
+assert_eq!("1.2k°C/s", 1234.5.human_throughput("°C"));
+```
+"#
+    )]
     fn human_throughput<T>(self, unit: T) -> HumanThroughputData<T>;
 
     /// Generate beautiful human-readable throughputs supporting automatic prefixes.
-    ///
-    /// ```
-    /// use human_repr::HumanThroughput;
-    /// assert_eq!("1.2k/s", 1234.5.human_throughput_bare());
-    /// ```
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "space")),
+        doc = r#"
+
+```
+use human_repr::HumanThroughput;
+assert_eq!("1.2k/s", 1234.5.human_throughput_bare());
+```
+"#
+    )]
     fn human_throughput_bare(self) -> HumanThroughputData<&'static str> {
         self.human_throughput("")
     }
 
     /// Generate beautiful human-readable throughputs supporting automatic prefixes and Bytes `B` as the unit.
-    ///
-    /// ```
-    /// use human_repr::HumanThroughput;
-    /// assert_eq!("1.2kB/s", 1234.5.human_throughput_bytes());
-    /// ```
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "space")),
+        doc = r#"
+
+```
+use human_repr::HumanThroughput;
+assert_eq!("1.2kB/s", 1234.5.human_throughput_bytes());
+```
+"#
+    )]
     fn human_throughput_bytes(self) -> HumanThroughputData<&'static str> {
         self.human_throughput(BYTES)
     }

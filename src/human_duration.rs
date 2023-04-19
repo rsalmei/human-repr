@@ -76,7 +76,7 @@ impl HumanDuration for Duration {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, not(any(feature = "1024", feature = "iec", feature = "space"))))]
 mod tests {
     use crate::HumanDuration;
 
