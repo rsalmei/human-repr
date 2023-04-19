@@ -33,7 +33,7 @@ pub struct HumanThroughputData<T> {
 
 const BYTES: &str = "B";
 
-/// Human representation count trait, supporting all Rust primitive number types.
+/// Human Count functionality provider, supporting all Rust primitive number types.
 pub trait HumanCount: sealed::Sealed + Sized {
     /// Generate beautiful human-readable counts supporting automatic prefixes and custom units.
     #[cfg_attr(
@@ -79,7 +79,7 @@ assert_eq!("4.2MB", 4221432u32.human_count_bytes());
     }
 }
 
-/// Human representation duration trait, supporting all Rust primitive number types and Duration.
+/// Human Duration functionality provider, supporting all Rust primitive number types and Duration.
 pub trait HumanDuration: sealed::Sealed + Sized {
     /// Generate beautiful human-readable durations supporting automatic prefixes.
     #[cfg_attr(
@@ -105,7 +105,7 @@ assert_eq!("160ms", d.human_duration());
     fn human_duration(self) -> HumanDurationData;
 }
 
-/// Human representation throughput trait, supporting all Rust primitive number types.
+/// Human Throughput functionality provider, supporting all Rust primitive number types.
 pub trait HumanThroughput: sealed::Sealed + Sized {
     /// Generate beautiful human-readable throughputs supporting automatic prefixes and custom units.
     #[cfg_attr(
