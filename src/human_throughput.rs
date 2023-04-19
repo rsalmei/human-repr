@@ -5,7 +5,7 @@ use std::fmt::{self, Debug, Display};
 const SPEC: &[(f64, &str, usize)] = &[
     (24., "/d", 2),
     (60., "/h", 1),
-    (60., "/m", 1),
+    (60., "/min", 1),
     // "/s" in code.
 ];
 
@@ -62,16 +62,16 @@ mod tests {
         assert_eq!("-1B/s", (-1).human_throughput_bytes());
         assert_eq!("1.2MB/s", (1234567. / 1.).human_throughput_bytes());
         assert_eq!("10B/s", (10. / 1.).human_throughput_bytes());
-        assert_eq!("30B/m", (1. / 2.).human_throughput_bytes());
-        assert_eq!("-30B/m", (-1. / 2.).human_throughput_bytes());
+        assert_eq!("30B/min", (1. / 2.).human_throughput_bytes());
+        assert_eq!("-30B/min", (-1. / 2.).human_throughput_bytes());
         assert_eq!("5B/s", (10. / 2.).human_throughput_bytes());
         assert_eq!("5.5B/s", (11. / 2.).human_throughput_bytes());
-        assert_eq!("6.1B/m", (10. / 99.).human_throughput_bytes());
-        assert_eq!("1.8B/m", (3. / 100.).human_throughput_bytes());
-        assert_eq!("4.4B/m", (8. / 110.).human_throughput_bytes());
+        assert_eq!("6.1B/min", (10. / 99.).human_throughput_bytes());
+        assert_eq!("1.8B/min", (3. / 100.).human_throughput_bytes());
+        assert_eq!("4.4B/min", (8. / 110.).human_throughput_bytes());
         assert_eq!("6.8B/h", (3. / 1600.).human_throughput_bytes());
         assert_eq!("1.9kB/s", (3000000. / 1600.).human_throughput_bytes());
-        assert_eq!("4.8B/m", (54327375. / 675876554.).human_throughput_bytes());
+        assert_eq!("4.8B/min", (5432737. / 67587655.).human_throughput_bytes());
         assert_eq!("28.9B/h", (5432737. / 675876554.).human_throughput_bytes());
         assert_eq!("8B/s", (5432737542. / 675876554.).human_throughput_bytes());
         assert_eq!("1B/s", (1. / 0.99).human_throughput_bytes());
