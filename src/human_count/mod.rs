@@ -1,209 +1,71 @@
-mod human;
+mod data;
 mod repr;
 
-use crate::{metric_prefix, utils, Sep};
-pub use human::HumanCount;
-pub use repr::ReprCount;
-use std::borrow::Cow;
-use std::fmt::{self, Debug, Display, Formatter};
+use crate::sealed;
+use crate::utils::BYTES;
+pub use data::HumanCountData;
+pub use repr::{HumanCountRepr, IntoHumanCountRepr};
 
-/// The HumanCount data object, ready to generate Display and Debug representations.
-#[derive(PartialEq, PartialOrd)]
-pub struct HumanCountData<'a> {
-    // TODO change <'a> to <const U: &'static str> as soon as it lands on stable.
-    pub val: f64,
-    pub unit: Cow<'a, str>,
-    pub repr: Option<ReprCount>,
-}
-
-impl Display for HumanCountData<'_> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        const SEP_DEFAULT: Sep = match cfg!(feature = "sep_count") {
-            true => Sep::WithSep,
-            false => Sep::NoSep,
-        };
-
-        let HumanCountData { val, repr, .. } = *self;
-        let ReprCount { sys, sep } = repr.unwrap_or_default();
-        let sep = sep.unwrap_or(SEP_DEFAULT);
-        let func = match val.abs() < 1. {
-            true => metric_prefix::small_repr,
-            false => metric_prefix::large_repr,
-        };
-        func(val, &self.unit, sys, sep, f)
+/// Generate beautiful human-friendly counts.
+pub trait HumanCount: sealed::Sealed + Sized {
+    /// Generate a beautiful human-friendly count with automatic prefixes.
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "sep_count")),
+        doc = r#"
+        ```
+        use human_repr::HumanCount;
+        assert_eq!("4.2M", 4221432u32.human_count());
+        ```
+        "#
+    )]
+    #[inline]
+    fn human_count(self) -> HumanCountData {
+        self.human_count_as::<&'static str>(None)
     }
+
+    /// Generate a beautiful human-friendly count with automatic prefixes and `"B"` (bytes) unit.
+    #[cfg_attr(
+        not(any(feature = "1024", feature = "iec", feature = "sep_count")),
+        doc = r#"
+        ```
+        use human_repr::HumanCount;
+        assert_eq!("4.2MB", 4221432u32.human_count_bytes());
+        ```
+        "#
+    )]
+    #[inline]
+    fn human_count_bytes(self) -> HumanCountData {
+        self.human_count_as(BYTES)
+    }
+
+    /// Generate a beautiful human-friendly count with automatic prefixes and custom representations.
+    ///
+    /// Just send a unit, a [`System`], a [`Precision`] (or u8 for fixed precision), or a [`Separator`]
+    /// (or a bool), or even a tuple of them all, in any order!
+    /// ```
+    /// use human_repr::{HumanCount, Precision, Separator, System};
+    /// assert_eq!("1.23M🦀", 1234567u32.human_count_as("🦀"));
+    /// assert_eq!("1.18Mi", 1234567u32.human_count_as(System::IEC));
+    /// assert_eq!("1.2346M", 1234567u32.human_count_as(4));
+    /// assert_eq!("1.23 M", 1234567u32.human_count_as(true));
+    /// assert_eq!("1.235 M°C", 1234567u32.human_count_as(("°C", 3, Separator::Yes)));
+    /// assert_eq!("1.234567Mtests", 1234567u32.human_count_as((Precision::Full, "tests")));
+    /// assert_eq!("1.2MT", 1234567u32.human_count_as((System::SI2, "T", false, 1)));
+    /// ```
+    fn human_count_as<T: IntoHumanCountRepr>(self, repr: impl Into<Option<T>>) -> HumanCountData;
 }
 
-impl Debug for HumanCountData<'_> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let mut d = f.debug_struct("HumanCount");
-        d.field("val", &self.val).field("unit", &self.unit);
-        if let Some(repr) = &self.repr {
-            d.field("repr", &format_args!("{repr}"));
+macro_rules! impl_trait {
+    ($($t:ty),+) => {$(
+        impl HumanCount for $t {
+            #[inline]
+            fn human_count_as<T: IntoHumanCountRepr>(self, repr: impl Into<Option<T>>) -> HumanCountData {
+                HumanCountData {
+                    val: self as f64,
+                    repr:  repr.into().map(IntoHumanCountRepr::into_repr),
+                }
+            }
         }
-        d.finish()?;
-        write!(f, " -> ")?;
-        Display::fmt(self, f)
-    }
+    )+}
 }
-
-impl PartialEq<HumanCountData<'_>> for &str {
-    fn eq(&self, other: &HumanCountData<'_>) -> bool {
-        utils::compare_display(self, other)
-    }
-}
-
-impl PartialEq<&str> for HumanCountData<'_> {
-    fn eq(&self, other: &&str) -> bool {
-        other == self
-    }
-}
-
-#[cfg(feature = "parse")]
-mod parse {
-    use super::HumanCountData;
-
-    impl std::str::FromStr for HumanCountData<'_> {
-        type Err = &'static str;
-
-        fn from_str(_s: &str) -> Result<Self, Self::Err> {
-            todo!()
-        }
-    }
-
-    #[cfg(test)]
-    mod tests {
-        #[test]
-        fn parse() -> Result<(), serde_json::Error> {
-            todo!()
-        }
-    }
-}
-
-#[cfg(feature = "serde")]
-mod serde {
-    use super::HumanCountData;
-    use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-
-    impl Serialize for HumanCountData<'_> {
-        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
-        {
-            serializer.collect_str(&format_args!("{:#}", self))
-        }
-    }
-
-    impl<'de> Deserialize<'de> for HumanCountData<'_> {
-        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
-        {
-            let s = <&str>::deserialize(deserializer)?;
-            s.parse().map_err(de::Error::custom)
-        }
-    }
-
-    #[cfg(test)]
-    mod tests {
-        use crate::{HumanCount, HumanCountData};
-
-        #[test]
-        fn serde() -> Result<(), serde_json::Error> {
-            let h = 123456.human_count_of("X");
-            let ser = serde_json::to_string(&h)?;
-            assert_eq!(r#"{"val":123456.0,"unit":"X"}"#, &ser);
-            let h2 = serde_json::from_str::<HumanCountData>(&ser)?;
-            assert_eq!(h, h2);
-            Ok(())
-        }
-    }
-}
-
-#[cfg(all(
-    test,
-    not(any(feature = "1024", feature = "iec", feature = "sep_count"))
-))]
-mod tests {
-    use crate::*;
-
-    #[test]
-    fn types() {
-        assert_eq!("123", 123_u8.human_count());
-        assert_eq!("123", 123_i8.human_count());
-        assert_eq!("123", 123_u16.human_count());
-        assert_eq!("123", 123_i16.human_count());
-        assert_eq!("123", 123_u32.human_count());
-        assert_eq!("123", 123_i32.human_count());
-        assert_eq!("123", 123_u64.human_count());
-        assert_eq!("123", 123_i64.human_count());
-        assert_eq!("123", 123_u128.human_count());
-        assert_eq!("123", 123_i128.human_count());
-        assert_eq!("123", 123_usize.human_count());
-        assert_eq!("123", 123_isize.human_count());
-        assert_eq!("123", 123_f32.human_count());
-        assert_eq!("123", 123_f64.human_count());
-
-        assert_eq!("-123", (-123_i8).human_count());
-        assert_eq!("-123", (-123_i16).human_count());
-        assert_eq!("-123", (-123_i32).human_count());
-        assert_eq!("-123", (-123_i64).human_count());
-        assert_eq!("-123", (-123_i128).human_count());
-        assert_eq!("-123", (-123_isize).human_count());
-        assert_eq!("-123", (-123_f32).human_count());
-        assert_eq!("-123", (-123_f64).human_count());
-    }
-
-    #[test]
-    fn units() {
-        assert_eq!("123MCrabs", 123e6.human_count_of("Crabs"));
-        assert_eq!("123k🦀", 123e3.human_count_of("🦀"));
-        assert_eq!("12.3k°C", 123e2.human_count_of("°C"));
-    }
-
-    #[test]
-    fn repr() {
-        assert_eq!("12.3M", 123e5.human_count_with("", None)); // default.
-        assert_eq!("11.7Mi", 123e5.human_count_with("", System::IEC)); // with system.
-        assert_eq!("12.3 M", 123e5.human_count_with("", Sep::WithSep)); // with sep.
-        assert_eq!(
-            "11.7 Mi",
-            123e5.human_count_with("", ReprCount::new(System::IEC, Sep::WithSep))
-        ); // with system and sep.
-
-        assert_eq!("12.3MUnit", 123e5.human_count_with("Unit", None)); // with unit.
-        assert_eq!("11.7MiUnit", 123e5.human_count_with("Unit", System::IEC)); // with system and unit.
-        assert_eq!("12.3 MUnit", 123e5.human_count_with("Unit", Sep::WithSep)); // with sep and unit.
-        assert_eq!(
-            "11.7 MiUnit",
-            123e5.human_count_with("Unit", ReprCount::new(System::IEC, Sep::WithSep))
-        ); // with system, sep and unit.
-    }
-
-    #[test]
-    #[allow(clippy::needless_borrow)]
-    fn ownership() {
-        let mut a = 42000;
-        assert_eq!("42k", a.human_count());
-        assert_eq!("42k", (&a).human_count());
-        assert_eq!("42k", (&mut a).human_count());
-    }
-
-    #[test]
-    fn symmetric() {
-        assert_eq!(123000_u64.human_count(), "123k");
-    }
-
-    #[test]
-    fn eq() {
-        let c1 = 0.23403454432.human_count();
-        assert_eq!("0.2", c1);
-        let c2 = 0.234034.human_count();
-        assert_eq!("0.2", c2); // same repr.
-        assert_ne!(c1, c2); // but different.
-
-        let c3 = 0.234034.human_count_bytes(); // same value.
-        assert_eq!("0.2B", c3); // different unit.
-        assert_ne!(c2, c3); // also different.
-    }
-}
+impl_trait!(u8, u16, u32, u64, u128, usize, f32, f64, i8, i16, i32, i64, i128, isize);
