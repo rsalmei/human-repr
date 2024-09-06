@@ -1,8 +1,7 @@
 mod data;
 mod repr;
 
-use crate::sealed;
-use crate::utils::BYTES;
+use crate::utils::{sealed, BYTES};
 pub use data::HumanCountData;
 pub use repr::{HumanCountRepr, IntoHumanCountRepr};
 

@@ -61,6 +61,18 @@ pub fn compare_display(expected: &str, human: &impl Display) -> bool {
     write!(HeapLessCompare(it.by_ref()), "{human}").is_ok_and(|()| it.len() == 0)
 }
 
+pub mod sealed {
+    use std::time::Duration;
+
+    pub trait Sealed {}
+    macro_rules! impl_sealed {
+        ($($t:ty),+) => {
+            $(impl Sealed for $t {})+
+        }
+    }
+    impl_sealed! {(), u8, u16, u32, u64, u128, usize, f32, f64, i8, i16, i32, i64, i128, isize, Duration}
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
