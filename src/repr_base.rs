@@ -1,18 +1,24 @@
-use std::fmt::{self, Display, Formatter};
-
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
-pub enum Precision {
-    Fixed(u8),
-    Full,
+/// The system used to represent metric prefixes.
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub enum System {
+    /// SI system (1000 divisor).
+    #[default]
+    SI,
+    /// SI system with binary prefix (1024 divisor).
+    SI2,
+    /// IEC system (1024 divisor).
+    IEC,
 }
 
-impl Display for Precision {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            Precision::Fixed(prec) => write!(f, "{prec}"),
-            Precision::Full => write!(f, "full"),
-        }
-    }
+/// The precision used when formatting values.
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum Precision {
+    /// Automatically select the best precision, from 0 to 2 decimals.
+    Auto,
+    /// Use the given number of decimals.
+    Fixed(u8),
+    /// Use full precision.
+    Full,
 }
 
 impl From<u8> for Precision {
@@ -21,34 +27,29 @@ impl From<u8> for Precision {
     }
 }
 
-/// Tells if the human representation should separate numbers and prefixes.
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
-pub enum Separator {
-    Yes,
-    No,
+/// Specifies how the human representation should split values, prefixes, and units.
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum Split {
+    /// Do not split at any point, i.e., `{value}{prefix}{unit}`.
+    Join,
+    /// Split at the prefix, i.e., `{value} {prefix}{unit}`.
+    Prefix,
+    /// Split at the unit, i.e., `{value}{prefix} {unit}`.
+    Unit,
 }
 
-impl Display for Separator {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            Separator::Yes => write!(f, " "),
-            Separator::No => Ok(()),
-        }
-    }
-}
-
-impl From<bool> for Separator {
+impl From<bool> for Split {
     fn from(value: bool) -> Self {
         Self::from(value)
     }
 }
 
-impl Separator {
+impl Split {
     pub const fn from(value: bool) -> Self {
         if value {
-            Separator::Yes
+            Split::Prefix
         } else {
-            Separator::No
+            Split::Join
         }
     }
 }
