@@ -12,9 +12,6 @@ readme = "README.md"
 license = "MIT"
 
 [features]
-1024 = []
-iec = ["1024"]
-space = []
 
 [dependencies]
 serde = { version = "1", optional = true, features = ["derive"] }

@@ -1,7 +1,3 @@
-#![cfg_attr(
-    not(any(feature = "1024", feature = "iec", feature = "space")), 
-    doc = include_str!("../README.md")
-)]
 
 mod human_count;
 mod human_duration;

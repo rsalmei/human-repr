@@ -8,30 +8,12 @@ pub use repr::{HumanCountRepr, IntoHumanCountRepr};
 /// Generate beautiful human-friendly counts.
 pub trait HumanCount: sealed::Sealed + Sized {
     /// Generate a beautiful human-friendly count with automatic prefixes.
-    #[cfg_attr(
-        not(any(feature = "1024", feature = "iec", feature = "sep_count")),
-        doc = r#"
-        ```
-        use human_repr::HumanCount;
-        assert_eq!("4.2M", 4221432u32.human_count());
-        ```
-        "#
-    )]
     #[inline]
     fn human_count(self) -> HumanCountData {
         self.human_count_as::<&'static str>(None)
     }
 
     /// Generate a beautiful human-friendly count with automatic prefixes and `"B"` (bytes) unit.
-    #[cfg_attr(
-        not(any(feature = "1024", feature = "iec", feature = "sep_count")),
-        doc = r#"
-        ```
-        use human_repr::HumanCount;
-        assert_eq!("4.2MB", 4221432u32.human_count_bytes());
-        ```
-        "#
-    )]
     #[inline]
     fn human_count_bytes(self) -> HumanCountData {
         self.human_count_as(BYTES)
