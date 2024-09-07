@@ -1,23 +1,25 @@
 [package]
 name = "human-repr"
-version = "1.1.0"
+version = "2.0.0"
 edition = "2021"
 authors = ["Rogério Sampaio de Almeida <rsalmei@gmail.com>"]
-description = "Generate beautiful human representations of bytes, durations, and even throughputs!"
-keywords = ["format", "convert", "bytes", "duration", "throughput"]
-categories = ["value-formatting", "date-and-time"]
+description = "Generate and parse beautiful human representations of bytes, durations, and even throughputs!"
+keywords = ["format", "parse", "bytes", "duration", "throughput"]
+categories = ["value-formatting", "date-and-time", "parsing"]
 documentation = "https://docs.rs/human-repr/"
 repository = "https://github.com/rsalmei/human-repr"
 readme = "README.md"
 license = "MIT"
 
 [features]
+parse = []
+serde = ["dep:serde", "parse"]
 
 [dependencies]
 serde = { version = "1", optional = true, features = ["derive"] }
 
 [dev-dependencies]
-criterion = "0.4"
+criterion = "0.5"
 serde_json = "1"
 
 [[bench]]
