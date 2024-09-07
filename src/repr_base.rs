@@ -11,9 +11,10 @@ pub enum System {
 }
 
 /// The precision used when formatting values.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub enum Precision {
     /// Automatically select the best precision, from 0 to 2 decimals.
+    #[default]
     Auto,
     /// Use the given number of decimals.
     Fixed(u8),
@@ -28,9 +29,10 @@ impl From<u8> for Precision {
 }
 
 /// Specifies how the human representation should split values, prefixes, and units.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub enum Split {
     /// Do not split at any point, i.e., `{value}{prefix}{unit}`.
+    #[default]
     Join,
     /// Split at the prefix, i.e., `{value} {prefix}{unit}`.
     Prefix,
